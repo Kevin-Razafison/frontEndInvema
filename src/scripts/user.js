@@ -1,6 +1,17 @@
 import { API_URL } from "../data/apiUrl.js";
 import { fetchProducts } from "../data/product.js";
 
+  const token = localStorage.getItem("token");
+  if (token) {
+    // Si déjà connecté, évite de retourner sur login
+    const role = localStorage.getItem("role");
+    if (role === "ADMIN") {
+      window.location.replace("./index.html#/");
+    } else {
+      window.location.replace("./user.html");
+    }
+  }
+
 const addRequestBtn = document.querySelector(".add-request");
 
 addRequestBtn.addEventListener("click", async () => {

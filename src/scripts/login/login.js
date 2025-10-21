@@ -1,6 +1,17 @@
 import { API_URL } from "../../data/apiUrl.js";
 import { render } from "../utils/render.js";
 
+  const token = localStorage.getItem("token");
+  if (token) {
+    // Si déjà connecté, évite de retourner sur login
+    const role = localStorage.getItem("role");
+    if (role === "ADMIN") {
+      window.location.replace("./index.html#/");
+    } else {
+      window.location.replace("./user.html");
+    }
+  }
+
 function togglePasswordVisibility() {
   const passwordInput = document.querySelector('#loginPassword');
   const toggleIcon = document.querySelector(".toggle-password");
