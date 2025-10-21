@@ -1,0 +1,107 @@
+main .categorie-product-list-pannel{
+    width: 90%;
+    margin-top: 85px;
+    margin-left: 12px;
+    margin-right: 15px;
+}
+
+main .categorie-product-list-pannel .product-list-title-pannel{
+    font-weight: 500;
+    font-size: 24px;
+}
+
+main .categorie-product-list-pannel .categorie-product-list-filter{
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+}
+
+.add-request{
+    padding: 12px 25px;
+    background-color: white;
+    position: fixed;
+    margin-top: 100px;
+    left: 0px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+main .categorie-product-list-pannel .categorie-product-list-filter .button:active{
+    opacity: 0.7;
+}
+
+
+.product-list-container{
+    width: 100%;
+    height: 100%;
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 50px;
+    overflow: auto;
+}
+.product-list-container .product-list-card{
+    background-color: white;
+    width: 250px;
+    height: 344px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.product-list-card .image-container{
+    width: 100%;
+    height: 65%;
+}
+
+.product-list-card .image-container img{
+    width: 100%;
+    height: 100%;
+}
+.product-list-card .card-info{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.product-list-card .card-info div{
+    height: 30px;
+    padding-left: 15px;
+    background-color: #7d7d7d;
+    color: rgb(203, 198, 198);
+}
+.product-list-card .card-info .product-name{
+    display: flex;
+    justify-content: center;
+    padding-right: 15px;
+    align-items: center;
+    font-weight: bold;
+}
+
+.categorie-product-list-pannel .search-bar{
+    margin: 12px;
+    width: 500px;
+    height: 30px;
+    border-radius: 7px;
+    border: none;
+    padding-left: 12px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+.add-request {
+    position: absolute; /* pour placer par rapport au parent */
+    left: 20px;         /* distance depuis la gauche */
+    top: 20px;          /* distance depuis le haut */
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.add-request:hover {
+    background-color: #0056b3;
+}

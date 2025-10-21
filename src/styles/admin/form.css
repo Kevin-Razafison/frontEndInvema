@@ -1,0 +1,102 @@
+body .form {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    overflow: auto;
+}
+
+body .form .back-ground{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    opacity: 0.2;
+    background-color: black;
+}
+
+body .form .form-container{
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    background-color: white;
+    height: 70%;
+    overflow: auto;
+    padding: 25px 50px;
+    border-radius: 12px;
+}
+
+body .form .form-container .title{
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+body .form .form-container .input div{
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+body .form .form-container .input input{
+    padding-left: 12px;
+    margin-bottom: 12px;
+    width: 250px;
+    height: 30px;
+    border-radius: 5px;
+    border:  none;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+}
+body .form .form-container .button-container{
+    margin-top: 25px;
+    width: 100%;
+    display: flex;
+    align-items: start;
+    justify-content: space-evenly;
+}
+body .form .form-container .button{
+    padding: 10px 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+body .form .form-container .add-category{
+    background-color: rgb(72, 143, 72);
+    color: white;
+}
+body .form .form-container .delete-category{
+    background-color: rgb(209, 164, 164);
+    color: white;
+}
+body .form .form-container .annuler{
+    background-color: rgb(218, 21, 21);
+    color: white;
+}
+body .form select{
+    background-color: white;
+    width: 250px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    padding-left: 12px;
+}
+
+body .form .input {
+    position: relative;
+}
+body .form .icons{
+    position: absolute;
+    top: 40%;
+    right: -25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}

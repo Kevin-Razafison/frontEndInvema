@@ -1,0 +1,113 @@
+.fournisseurs-pannel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.fournisseurs-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.image-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fournisseur-logo {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+}
+
+.input-file {
+  margin-top: 10px;
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.button-container button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+button.Modifier {
+  background-color: #007bff;
+  color: white;
+}
+
+button.Supprimer {
+  background-color: #dc3545;
+  color: white;
+}
+
+button.terminer-modif {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.info-side {
+  flex: 1;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.info-item input {
+  display: none;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  flex: 1;
+}
+
+.product-List-Provided {
+  background: #fafafa;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.product-list-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+}
+
+.product-list-card img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+}

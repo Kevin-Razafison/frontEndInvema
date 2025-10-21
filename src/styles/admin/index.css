@@ -1,0 +1,42 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    transition: all ease-in-out 0.15s;
+}
+* button {
+    cursor: pointer;
+}
+
+body{
+    background-color: #d9dbdd;
+    height: 100%;
+    width: 100%;
+}
+
+@media (max-width: 1306px) {
+    nav section div{
+        display: none;
+    };
+
+    body nav{
+        width: 100px;
+    };
+    body nav section{
+        width: 70%
+    }
+    main{
+        margin-left: -150px;
+    }
+}
+
+@media(max-width: 500px){
+    nav {
+        width: 0;
+        display: none;
+    }
+    
+    main {
+        left: 40%;
+    }
+}

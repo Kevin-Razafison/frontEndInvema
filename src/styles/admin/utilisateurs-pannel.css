@@ -1,0 +1,123 @@
+main .utilisateur-pannel-container{
+    height: auto;
+    width: 100%;
+    padding-bottom: 35px;
+}
+
+main .utilisateur-pannel-container .pannel-title{
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+main .utilisateur-pannel-container .ajouter-utilisateurs{
+    border: none;
+    position: fixed;
+    padding: 12px;
+    background-color: #142536;
+    border-radius: 12px;
+    width: 77.5%;
+    display: flex;
+    justify-content: space-around;
+}
+main .utilisateur-pannel-container .ajouter-utilisateurs button{
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: rgb(194, 242, 143);
+}
+
+main .utilisateur-pannel-container .ajouter-utilisateurs button:active{
+    opacity: 0.7;
+}
+
+main .utilisateur-pannel-container .list-users-containers{
+    padding-top: 12px;
+    width: 1264px;
+    height: auto;
+    color: #494949;
+    background-color:#c4c4c4;
+    display: flex;
+    flex-direction: column;
+    margin-top: 12px;
+    border-radius: 12px;
+    padding-bottom: 12px;
+    margin-top: 100px;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-title{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-right: 30px;
+    margin-left: 10px;
+    margin-bottom: 12px;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row{
+    width: 94%;
+    display: grid;
+    grid-template-columns: 310px 310px 310px 320px;
+    margin-left: 20px;
+    padding-left: 15px;
+    padding-top: 5px;
+    color: #262626;
+    background-color: white;
+    border-radius: 12px;
+    margin-bottom: 5px;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions{
+    display: flex;
+    flex-direction: row;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions img{
+    width: 24px;
+    margin-left: 12px;
+    cursor: pointer;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-name-column{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .button img{
+    width: 24px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column img{
+    width: 24px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .button:active{
+    opacity: 0.7;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column{
+    display: flex;
+    flex-direction: row;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission{
+    cursor: pointer;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission :active{
+    opacity: 0.7;
+}
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column div{
+    margin-right: 9px;
+}
+
+main .filter-container .filter-button-container .filter {
+    background-color: white;
+    border-radius: 2px;
+
+}
+main .filter-container .filter-button-container .is-filter-active {
+    background-color: #494949;
+}
+

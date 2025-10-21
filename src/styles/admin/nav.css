@@ -1,0 +1,39 @@
+nav{
+    height: 100%;
+    width: 250px;
+    font-size: 13px;
+    position: fixed;
+    z-index: 1;
+    color: #96a0aa;
+    background-color: #142536;
+    top: 60px;
+    padding-top: 20px;
+    overflow: auto;
+}
+nav section {
+    margin-bottom: 10px;
+    display: flex;
+    padding-left: 30px;
+    align-items: center;
+    cursor: pointer;
+    width: 88%;
+}
+nav .nav-button:hover{
+    opacity: 0.7;
+    background-color: #283d53;
+}
+nav .nav-button:active{
+    opacity: 0.5;
+    background-color: #283d53;
+}
+nav section img {
+    margin-top: 25px;
+    height: 30px;
+    width: 30px;
+    margin-right: 10px;
+    margin-bottom: 30px;
+}
+
+.isNavActive{
+    background-color: #283d53;
+}

@@ -1,0 +1,48 @@
+body .popUp {
+    z-index: 999;
+    width: 350px;
+    height: 250px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 20%;
+    left: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 25px;
+    background-color: white;
+    border-radius: 5px;
+}
+body .popUp .message{
+    font-size: 10px;
+}
+body .popUp .pop-up-button-container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+body .popUp .pop-up-button-container button{
+    padding: 12px 15px;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    background-color: red;
+}
+body .popUp .pop-up-button-container button :hover{
+    opacity: 0.7;
+}
+body .popUp .pop-up-button-container button :active{
+    opacity: 0.5;
+}
+body .popUp .pop-up-button-container .confirmer{
+    background-color: green;
+}
+body .popUp .pop-up-button-container .confirmer :hover{
+    opacity:  0.7;
+}
+body .popUp .pop-up-button-container .confirmer :active{
+    opacity: 0.5;
+}

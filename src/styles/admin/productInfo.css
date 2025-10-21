@@ -1,0 +1,173 @@
+/* === PRODUIT PANEL === */
+.product-pannel {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin: 80px auto;
+  padding: 30px;
+  width: 85%;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* === FLÈCHE RETOUR === */
+.product-pannel .previous {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.product-pannel .previous:hover {
+  transform: translateX(-5px);
+  opacity: 0.8;
+}
+.product-pannel .previous img {
+  width: 30px;
+  height: 30px;
+}
+
+/* === IMAGE SECTION === */
+.product-pannel > div:nth-child(2) {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.product-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+  transition: opacity 0.3s ease;
+}
+
+/* === SECTION DROITE === */
+.fournisseurs-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* === INFO CONTAINER === */
+.information-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f7f9fc;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #d3d3d3;
+}
+.information-container div {
+  font-size: 15px;
+  color: #142536;
+}
+.information-container span {
+  font-weight: 600;
+  color: #222;
+}
+.information-container input,
+.information-container select {
+  display: none;
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* === IMAGE INPUT FILE === */
+.imageUrl {
+  display: none;
+  width: 90%;
+  border: 2px dashed #aaa;
+  border-radius: 10px;
+  padding: 15px;
+  background: #fafafa;
+  color: #555;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.3s ease;
+}
+.imageUrl:hover {
+  border-color: #3498db;
+  background: #ecf7ff;
+}
+
+/* === BOUTONS === */
+.button-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.button-container button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.Modifier {
+  background-color: #3498db;
+  color: white;
+}
+.Modifier:hover {
+  background-color: #2980b9;
+}
+.Supprimer {
+  background-color: #e74c3c;
+  color: white;
+}
+.Supprimer:hover {
+  background-color: #c0392b;
+}
+
+/* === MODE MODIFICATION ACTIVE === */
+.isProductActive .product-image {
+  opacity: 0;
+  pointer-events: none;
+}
+.isProductActive .imageUrl {
+  display: block;
+}
+
+/* === BOUTON CONFIRMATION === */
+.terminer-modif {
+  align-self: flex-end;
+  background-color: #27ae60;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+}
+.terminer-modif:hover {
+  background-color: #1e8449;
+  transform: scale(1.05);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 800px) {
+  .product-pannel {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .product-image {
+    width: 250px;
+    height: 250px;
+  }
+  .information-container {
+    width: 100%;
+  }
+}
