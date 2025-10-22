@@ -3,86 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INVEMA</title>
-    <link rel="stylesheet" href="src/styles/admin/popUp.css">
-    <link rel="stylesheet" href="src/styles/admin/fournisseurPannel.css">
-    <link rel="stylesheet" href="src/styles/admin/form.css">
-    <link rel="stylesheet" href="src/styles/admin/product.css">
-    <link rel="stylesheet" href="src/styles/admin/utilisateurs-pannel.css">
-    <link rel="stylesheet" href="src/styles/admin/commandes.css">
-    <link rel="stylesheet" href="src/styles/admin/fournisseurs.css">
-    <link rel="stylesheet" href="src/styles/admin/categories.css">
-    <link rel="stylesheet" href="src/styles/admin/dashboard.css">
-    <link rel="stylesheet" href="src/styles/admin/index.css">
-    <link rel="stylesheet" href="src/styles/admin/header.css">
-    <link rel="stylesheet" href="src/styles/admin/nav.css">
-    <link rel="stylesheet" href="src/styles/admin/index.css">
-    <link rel="stylesheet" href="src/styles/admin/productInfo.css">
-    <link rel="stylesheet" href="src/styles/admin/wait.css">
+    <title>login</title>
+    <link rel="stylesheet" href="src/styles/login_Styles/login.css">
 </head>
 <body>
-    <header>
-        <div class="left-section">
-            <div class="hamburger-menu ">
-                <img src="./src/icons/icons-menu.png" alt="menu">
-            </div>
-            <div class="logo-container">
-                <img src="./src/images/logo.png" alt="logo.png" class="logo-image">
-                <div class="board">ADMIN DASHBOARD</div>
-            </div>
-        </div>
-        <div class="right-section">
-        <button class="logout-button">se deconnecter</button> <!-- ajout -->
-        <div class="notification-container">
-            <img src="./src/icons/notification-icon.png" alt="notification">
-            <div class="notification-dropdown"></div> <!-- ajout -->
-        </div>
-        </div>
-    </header>
-    <nav>
-        <section class="nav-button dashboard-button">
-            <img src="./src/icons/icons-dashboard.png" alt="dashboard">
-             <div>
-                Tableau de bord
-             </div>
-        </section>
-        <section class="nav-button categories-button">
-            <img src="./src/icons/icons-data-sheet.png" alt="catégories">
-            <div>
-                Categories
-            </div>
-        </section>
-        <section class="nav-button fournisseurs-button">
-            <img src="src/icons/icons-erp-system.png" alt="Fournisseurs">
-            <div>
-                Fournisseurs
-            </div>
-        </section>
-        <section class="nav-button commandes-button">
-            <img src="src/icons/icons-cart.png" alt="Commandes"> 
-            <div>
-                Commandes
-            </div>
-        </section>
-        <section class="nav-button utilisateurs-button">
-            <img src="src/icons/icons-users.png" alt="Utilisateurs">
-            <div>
-                Gestion Utilisateurs
-            </div>
-        </section>
-                <section class="nav-button product-button">
-            <img src="src/icons/icons-product.png" alt="product">
-            <div>
-                Liste des produits
-            </div>
-        </section>
-    </nav>
-    <main id="main">
-
-    </main>
-    <div id="app"></div>
-  <div id="popup-container"></div>
-    <script type="module" src="./src/scripts/index.js"></script>
-    <script type="module" src="./src/scripts/header.js"></script>
+<div class="form-container">
+  <form id="loginForm">
+    <div class="title part">
+      <img src="./src/images/logo.png" alt="logo">
+      SE CONNECTER
+    </div>
+    <input type="email" class="part" id="loginEmail" placeholder="Email" required>
+    <div class="password-fa">
+      <input type="password" class="part" id="loginPassword" placeholder="Mot de passe" required> <div class="toggle-password">👁️</div>
+    </div>
+    <button type="submit" class="part">Se connecter</button>
+  </form>
+</div>
+<script type="module" src="src/scripts/login/login.js"></script>
 </body>
 </html>
