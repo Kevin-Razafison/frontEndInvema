@@ -50,8 +50,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     // ✅ Redirection différée pour laisser le temps au stockage
     setTimeout(() => {
+      render("/#wait");
       if (data.user.role === "ADMIN") {
-        window.location.replace("./index.html#/");
+        window.location.replace("./admin.html#/");
       } else {
         window.location.replace("./user.html");
       }
