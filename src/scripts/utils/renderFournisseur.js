@@ -31,7 +31,7 @@ export async function renderFournisseur(fournisseurId) {
             fournisseurAboutHTML = `
             <section class="fournisseurs-pannel">
                 <div class="fournisseurs-section">
-                    <img src="./src/icons/icons-arrow-left.png" alt="fournisseur-logo" class="fprevious">
+                    <img src="./src/icons/icons-arrow-left.png" alt="fournisseur-logo" class="previous">
                     <div class="image-side">
                         <img src="${API_URLimg}${fournisseur.imageUrl}" alt="fournisseur-logo" class="fournisseur-logo">
                         <input type="file" class="input-file" accept="image/*" style="display:none;">
@@ -152,11 +152,11 @@ export async function SupprimerButton() {
 
             if(!res.ok) throw Error("Echec de la supprésson");
             const fako = await res.json();
-            navigate("#/fournisseurs");
         }
         catch(err) {
             console.error(err);
         }
+        navigate("#/fournisseurs");
     })
 }
 

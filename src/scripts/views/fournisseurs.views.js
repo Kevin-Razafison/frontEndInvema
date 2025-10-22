@@ -9,8 +9,8 @@ function getIdFromHash(hash) {
   const params = new URLSearchParams(hash.split("?")[1]);
   return parseInt(params.get("id") || 0);
 }
-function navigate(route, id) {    
-    render(route,id);
+function navigate(route) {    
+    window.location.hash =route
 }
 
 let fournisseursCardsHTML=``;
@@ -279,7 +279,7 @@ async function refreshFournisseurs() {
         .join("");
     // 🔁 Réattacher les listeners sur les nouvelles cartes
     interactiveNavBar();
-    render(`index.html#/fournisseurs`);
+    navigate(`#/fournisseurs`);
   } catch (err) {
     console.error(err);
   }
