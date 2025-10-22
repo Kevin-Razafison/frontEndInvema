@@ -111,3 +111,7 @@ button.terminer-modif {
   border-radius: 8px;
   object-fit: cover;
 }
+
+.previous{
+  cursor: pointer;
+}
