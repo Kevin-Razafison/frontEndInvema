@@ -47,10 +47,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     localStorage.setItem("role", data.user.role);
 
     alert(`Connexion réussie ! Bienvenue ${data.user.name}`);
-
+    render("#/");
     // ✅ Redirection différée pour laisser le temps au stockage
     setTimeout(() => {
-      render("/#wait");
       if (data.user.role === "ADMIN") {
         window.location.replace("./admin.html#/");
       } else {
