@@ -31,6 +31,7 @@ export async function renderFournisseur(fournisseurId) {
             fournisseurAboutHTML = `
             <section class="fournisseurs-pannel">
                 <div class="fournisseurs-section">
+                    <img src="./src/icons/icons-arrow-left.png" alt="fournisseur-logo" class="fprevious">
                     <div class="image-side">
                         <img src="${API_URLimg}${fournisseur.imageUrl}" alt="fournisseur-logo" class="fournisseur-logo">
                         <input type="file" class="input-file" accept="image/*" style="display:none;">
@@ -138,6 +139,7 @@ export async function SupprimerButton() {
     supprimer.addEventListener('click',async ()=> {
         const informationContainer = document.querySelector(".information-container");
         const supplierID = Number(informationContainer.dataset.supplierId);
+        console.log(supplierID);
         try{
             const token = localStorage.getItem("token");
             const res = await fetch(`${API_URL}/supplier/${supplierID}`,{
