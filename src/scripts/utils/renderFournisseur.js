@@ -152,11 +152,11 @@ export async function SupprimerButton() {
 
             if(!res.ok) throw Error("Echec de la supprésson");
             const fako = await res.json();
+            navigate("#/fournisseurs");
         }
         catch(err) {
             console.error(err);
         }
-        navigate("#/fournisseurs");
     })
 }
 
