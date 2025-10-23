@@ -32,7 +32,6 @@ body{
 
 @media(max-width: 500px){
     nav {
-        width: 0;
         display: none;
     }
     
