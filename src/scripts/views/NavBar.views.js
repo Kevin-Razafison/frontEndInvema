@@ -7,9 +7,9 @@ function navigate(route) {
 export function interactiveNavBar() {
   const navBarButtons = document.querySelectorAll(".nav-button");
   document.querySelector(".hamburger-menu")
-  .addEventListener('click', ()=>{
+    .addEventListener('click', ()=>{
       document.querySelector("nav")
-        .style.display = "";
+        .style.display = "block";
   })
 
   navBarButtons.forEach((button) => {
@@ -56,4 +56,3 @@ export function interactiveNavBar() {
     });
   });
 }
-
