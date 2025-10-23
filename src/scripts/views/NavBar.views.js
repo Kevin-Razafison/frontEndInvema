@@ -6,10 +6,20 @@ function navigate(route) {
 
 export function interactiveNavBar() {
   const navBarButtons = document.querySelectorAll(".nav-button");
+  let isNavmenuShow = false;
   document.querySelector(".hamburger-menu")
     .addEventListener('click', ()=>{
+      if(!isNavmenuShow){
       document.querySelector("nav")
         .style.display = "block";
+        isNavmenuShow = true;
+      }else{
+              document.querySelector("nav")
+        .style.display = "none";
+        isNavmenuShow =false;
+      }
+
+
   })
 
   navBarButtons.forEach((button) => {
