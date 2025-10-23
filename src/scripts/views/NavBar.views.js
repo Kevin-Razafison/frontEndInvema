@@ -55,5 +55,5 @@ export function interactiveNavBar() {
 document.querySelector(".hamburger-menu")
   .addEventListener('click', ()=>{
       document.querySelector("nav")
-        .style.display = "block";
+        .style.display = "";
   })
