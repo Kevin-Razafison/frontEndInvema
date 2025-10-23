@@ -9,17 +9,18 @@ export function interactiveNavBar() {
   let isNavmenuShow = false;
   document.querySelector(".hamburger-menu")
     .addEventListener('click', ()=>{
+      const nav = document.querySelector("nav")
       if(!isNavmenuShow){
-      document.querySelector("nav")
-        .style.display = "block";
+        nav.style.display = "block";
+          nav.querySelectorAll("div")
+          .forEach(div => {
+            div.style.display = "";
+          })
         isNavmenuShow = true;
       }else{
-              document.querySelector("nav")
-        .style.display = "none";
+        nav.style.display = "none";
         isNavmenuShow =false;
       }
-
-
   })
 
   navBarButtons.forEach((button) => {
