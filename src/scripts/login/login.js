@@ -55,7 +55,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       } else {
         window.location.replace("./user.html");
       }
-    }, 150);
+    }, 0);
 
   } catch (err) {
     console.error(err);
