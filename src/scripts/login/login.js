@@ -51,6 +51,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     // ✅ Redirection différée pour laisser le temps au stockage
     setTimeout(() => {
       if (data.user.role === "ADMIN") {
+        console.log("ato ve");
         window.location.replace("./admin.html#/");
       } else {
         window.location.replace("./user.html");
