@@ -48,15 +48,15 @@
 }
 
 /* === SECTION DROITE === */
-.fournisseurs-section {
+.product-section {
   flex: 2;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 15px;
 }
 
 /* === INFO CONTAINER === */
-.information-container {
+.information-product-container {
   display: flex;
   flex-direction: column;
   gap: 10px;

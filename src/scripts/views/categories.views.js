@@ -7,7 +7,6 @@ function navigate(route) {
    window.location.hash = route;
 }
 
-
 export async function categories(){
     let categorieListVar = await categorieList();
       const cardsHTML = categorieListVar.map(cat => `
@@ -45,8 +44,14 @@ export function activateCategoryCard(){
 }
 
 async function activateCategorieButton() {
+
     if(document.querySelector('.categories-pannel'))
     {
+      const categoriesLista = await categorieList();
+        let categoriesNameList = [];
+        categoriesLista.forEach(category=> {
+            categoriesNameList.push(category.name);
+        })
        let labelAddList = [{
               name: "Entrer le nom de la nouvelle catégorie",
               className: "categorie-input",
@@ -72,7 +77,8 @@ async function activateCategorieButton() {
        let labelDeleteList = [{
               name: "Entrer le nom du catégorie à supprimer",
               className: "categorie-input",
-              placeholder: "Entrer le nom du catégorie à supprimer"
+              type: "select",
+              op: categoriesNameList
             }];
         let buttonDeleteList = [
               {
@@ -155,7 +161,7 @@ async function attachFormEvents() {
 
 async function deleteFormEvents() {
   const formSection = document.querySelector('.form');
-  const input = formSection.querySelector('input');
+  const input = formSection.querySelector('select');
   const add = formSection.querySelector('.delete-category');
   const cancel = formSection.querySelector('.annuler');
 
@@ -203,6 +209,9 @@ async function deleteFormEvents() {
       const newCategory = await res.json();
 
       formSection.remove();
+      interactiveNavBar();
+      attachCategoryCardEvents();
+      activateCategorieButton();
       refreshCategories();
     } catch (err) {
       console.error(err);

@@ -41,7 +41,7 @@ export function render(route, id = 0) {
         activateCategoryCard();
       })();
     } 
-        else if (route === "#/dashboard" || route==="#/") {
+    else if (route === "#/dashboard" || route==="#/") {
       (async () => {
         main.innerHTML = await view(); 
         interactiveNavBar();
@@ -82,7 +82,6 @@ export function render(route, id = 0) {
         previousProductButton();      
       })();
     }
-
     else if (route === "#/commandes") {
     (async () => {
         main.innerHTML = await view(); 
@@ -91,13 +90,12 @@ export function render(route, id = 0) {
     }
     else if(route === "#/fournisseurs") {
       (async ()=> {
-        main.innerHTML = await view(); // ⚠️ injecte enfin le HTML
-        await addFournisseur();
-        activateFournisseursButton(); 
+        setTimeout(async()=>main.innerHTML = await view(),0);
+        setTimeout(async()=> await addFournisseur(),0);
+        setTimeout(()=>activateFournisseursButton()); 
         interactiveNavBar();
       })();
     }
-
     else{
       main.innerHTML = view();
     }

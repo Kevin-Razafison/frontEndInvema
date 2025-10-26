@@ -42,7 +42,7 @@ export async function DashBoard() {
         value = requestPending.length;
         break;
       case 3:
-        value = priceTotal;
+        value = "Ar " + priceTotal;
         break;
       default:
         value = "";
@@ -63,13 +63,27 @@ export async function DashBoard() {
     const productObj = stock.find(p => p.id === Item.productId);
     const userName = userObj ? userObj.name : "—";
     const productName = productObj ? productObj.name : "—";
+    const date = Item.createdAt;
+    const safeDate = new Date(date);
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short',
+    });
     return `
       <div class="recent-activity-card-list-element">
         <img src="./src/icons/icons-quest.png" alt="request">
         <div class="user-name-requester">${userName}</div>
-        <div class="type-request">${Item.type || "—"}</div>
-        <div class="product-name-request">[${productName}]</div>
-        <div class="id-request">${Item.id}</div>
+        <div class="quantity-request">quantité demander: ${Item.quantity || "—"}</div>
+        <div class="type-request">${Item.status || "—"}</div>
+        <div class="date-request">${formatter.format(safeDate) || "—"}</div>
+        <div class="product-name-request">produit: ${productName}</div>
+        <div class="id-request">id: ${Item.id}</div>
+        <div class="product-name-request"><button class="approuver-button-y">Approuver</button></div>
       </div>
     `;
   }).join("");

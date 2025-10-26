@@ -55,6 +55,9 @@ export function form(title,label=[],button = {}){
     let formContainer =``;
     formContainer += `
     <div class="form-container">
+        <div class="form-img-container">
+            <img src="./src/images/logo.png" alt="logo.png">
+        </div>
         <div class="title">
             ${title}
         </div>

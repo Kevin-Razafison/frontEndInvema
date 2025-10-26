@@ -56,14 +56,15 @@ main .categories-container .option-card:active{
 
 main section .add-categorie{
     border: none;
-    background-color:  rgb(72, 143, 72);;
+    background-color: #142536;
     padding: 12px;
     border-radius: 5px;
     font-weight: bold;
     color: white;
     position: absolute;
     top: -25px;
-    left: 0;
+    width: 200px;
+    left: 15px;
 }
 
 main section .delete-categorie{
@@ -76,7 +77,9 @@ main section .delete-categorie{
     color: white;
     position: absolute;
     top: -25px;
-    left: 175px;
+    left: 210px;
+    width: 200px;
+    margin-left: 25px;
 }
 
 main section .add-categorie:hover{
@@ -122,5 +125,8 @@ main section .search-bar{
     }
     main .categories-container .option-card{
         width: 250px;
+    }
+    main section .delete-categorie{
+        margin-left: 15px;
     }
 }

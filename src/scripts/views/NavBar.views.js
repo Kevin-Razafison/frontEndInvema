@@ -1,6 +1,4 @@
 function navigate(route) {
-    // 🚀 Forcer le rafraîchissement de la vue
-
     window.location.hash = route;
 }
 

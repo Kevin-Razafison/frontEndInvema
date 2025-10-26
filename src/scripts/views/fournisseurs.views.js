@@ -39,11 +39,11 @@ function fournisseurs() {
             </div>
         </div>
         <div class="list-fournisseur">
-            ${fournisseursCardsHTML}
             <div class="add-fournisseur">
                 <img src="./src/icons/icons-add.png">
                 <div>Ajouter</div>
             </div>
+            ${fournisseursCardsHTML}
         </div>
     `
     return renderSection("fournisseurs-container", fournisseursHTML);
@@ -51,8 +51,8 @@ function fournisseurs() {
 
 async function addFournisseur(){
     if(document.querySelector(".fournisseurs-container")){
+        console.log(document.querySelector(".fournisseurs-container").innerHTML)
         let categories = await categorieList();
-        console.log(categories);
         let categoriesNameList = [];
         categories.forEach(category=> {
             categoriesNameList.push(category.name);
@@ -101,12 +101,12 @@ async function addFournisseur(){
                 name: "Ajouter",
                 className: "add-fournisseur"
               },
-
               {
                 name: "Annuler",
                 className: "annuler"
               }
             ];
+        console.log(addButton)
         addButton.addEventListener('click', ()=>{
             document.body.innerHTML += form('Ajouter Fournisseur', labelList, buttonList)
             attachFromEvents();
@@ -124,6 +124,7 @@ function attachFromEvents(){
 
     cancel.addEventListener('click', () => {
         formSection.remove();
+        activateFournisseursButton();
         addFournisseur();
         interactiveNavBar();
     })
@@ -277,9 +278,12 @@ async function refreshFournisseurs() {
         </div>
         `)
         .join("");
+        activateFournisseursButton()
+        attachFromEvents();
     // 🔁 Réattacher les listeners sur les nouvelles cartes
     interactiveNavBar();
-    navigate(`#/fournisseurs`);
+    activateFournisseursButton();
+    addFournisseur();
   } catch (err) {
     console.error(err);
   }

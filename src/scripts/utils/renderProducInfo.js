@@ -32,9 +32,9 @@ export async function renderProduct(productId){
                 <img src="./src/icons/icons-arrow-left.png" alt="">
             </div>
             <div>
-                <img src="${API_URLimg}${product.imageUrl}" alt="fournisseurs-logo" class="product-image">
+                <img src="${API_URLimg}${product.imageUrl}" alt="product-logo" class="product-image">
             </div>
-            <div class="fournisseurs-section">  
+            <div class="product-section">  
                 <div class="image-container">
                     <input type ="file" class="imageUrl" data-imgUrl="${product.imageUrl}" accept="image/*" >
                     <div class="button-container">
@@ -42,7 +42,7 @@ export async function renderProduct(productId){
                         <button class="Supprimer">Supprimer</button>
                     </div>
                 </div>
-                <div class="information-container" data-product-id="${product.id}">
+                <div class="information-product-container" data-product-id="${product.id}">
                     <div class="product-name ">
                         Name : <span class="supplier-name">${product.name}</span> <input type="text" class="input-modifier-name" value="${product.name}" required>
                     </div>
@@ -97,11 +97,11 @@ export async function modifierProductButton(){
     if(!modifier) return;
     modifier.addEventListener("click", ()=> {
         let data = [];
-        const informationContainer = document.querySelector(".information-container");
+        const informationContainer = document.querySelector(".information-product-container");
         const productId = Number(informationContainer.dataset.productId);
         const divList = informationContainer.querySelectorAll("div");
         console.log(divList);
-        document.querySelector(".fournisseurs-section").querySelector(".button-container").style.display = "none";
+        document.querySelector("product-section").querySelector(".button-container").style.display = "none";
         document.querySelector(".product-pannel").classList.add("isProductActive");
         divList.forEach((div,index)=>{
                 div.querySelector("span").style.display = "none";
@@ -165,7 +165,7 @@ export async function SupprimerProductButton() {
     const supprimer = document.querySelector(".Supprimer");
     if(!supprimer) return;
     supprimer.addEventListener('click',async ()=> {
-        const informationContainer = document.querySelector(".information-container");
+        const informationContainer = document.querySelector(".information-product-container");
         const productId = Number(informationContainer.dataset.productId);
         try{
             const token = localStorage.getItem("token");
