@@ -44,13 +44,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Erreur login");
 
-    // ✅ Stockage sécurisé avant redirection
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.user.role);
 
     alert(`Connexion réussie ! Bienvenue ${data.user.name}`);
     render("#/");
-    // ✅ Redirection différée pour laisser le temps au stockage
     setTimeout(() => {
       if (data.user.role === "ADMIN") {
         console.log("ato ve");
