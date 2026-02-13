@@ -1,20 +1,21 @@
 import { API_URL } from "../../data/apiUrl.js";
 import { render } from "../utils/render.js";
 
-  const token = localStorage.getItem("token");
-  if (token) {
-    // Si déjà connecté, évite de retourner sur login
-    const role = localStorage.getItem("role");
-    if (role === "ADMIN") {
-      window.location.replace("./index.html#/");
-    } else {
-      window.location.replace("./user.html");
-    }
+const token = localStorage.getItem("token");
+if (token) {
+  const role = localStorage.getItem("role");
+  if (role === "ADMIN") {
+    window.location.replace("./index.html#/");
+  } else {
+    window.location.replace("./user.html");
   }
+}
 
 function togglePasswordVisibility() {
   const passwordInput = document.querySelector('#loginPassword');
   const toggleIcon = document.querySelector(".toggle-password i");
+  if (!passwordInput || !toggleIcon) return;
+
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
     toggleIcon.classList.remove('fa-eye');
@@ -26,13 +27,24 @@ function togglePasswordVisibility() {
   }
 }
 
-document.querySelector('.toggle-password')
-  .addEventListener('click', togglePasswordVisibility);
+document.querySelector('.toggle-password')?.addEventListener('click', togglePasswordVisibility);
 
+// Gestion de la soumission du formulaire
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
+  const loginButton = document.getElementById("loginButton");
+  const buttonText = document.getElementById("buttonText");
+  const spinner = document.getElementById("loadingSpinner");
+
+  // Désactiver le bouton et afficher le spinner
+  if (loginButton && buttonText && spinner) {
+    loginButton.disabled = true;
+    buttonText.style.display = "none";
+    spinner.style.display = "inline-block";
+  }
 
   try {
     const res = await fetch(`${API_URL}/auth/login`, {
@@ -47,11 +59,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.user.role);
 
-    alert(`Connexion réussie ! Bienvenue ${data.user.name}`);
     render("#/");
+
     setTimeout(() => {
       if (data.user.role === "ADMIN") {
-        console.log("ato ve");
         window.location.replace("./admin.html#/");
       } else {
         window.location.replace("./user.html");
@@ -61,5 +72,12 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   } catch (err) {
     console.error(err);
     alert("Impossible de se connecter : " + err.message);
+
+    // En cas d'erreur, réactiver le bouton
+    if (loginButton && buttonText && spinner) {
+      loginButton.disabled = false;
+      buttonText.style.display = "inline";
+      spinner.style.display = "none";
+    }
   }
 });
