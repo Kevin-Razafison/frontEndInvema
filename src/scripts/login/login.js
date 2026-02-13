@@ -14,13 +14,15 @@ import { render } from "../utils/render.js";
 
 function togglePasswordVisibility() {
   const passwordInput = document.querySelector('#loginPassword');
-  const toggleIcon = document.querySelector(".toggle-password");
+  const toggleIcon = document.querySelector(".toggle-password i");
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
-    toggleIcon.textContent = "🙈"; 
+    toggleIcon.classList.remove('fa-eye');
+    toggleIcon.classList.add('fa-eye-slash');
   } else {
     passwordInput.type = "password";
-    toggleIcon.textContent = "👁️";
+    toggleIcon.classList.remove('fa-eye-slash');
+    toggleIcon.classList.add('fa-eye');
   }
 }
 
