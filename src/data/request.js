@@ -1,13 +1,4 @@
-/**
- * ========================================
- * MODULE DE GESTION DES REQUÊTES/DEMANDES
- * ========================================
- * 
- * Ce fichier gère toutes les opérations liées aux demandes de produits :
- * - Récupération de la liste des requêtes
- * - Création, modification, suppression de requêtes
- * - Approbation et rejet de requêtes
- */
+
 
 import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
 

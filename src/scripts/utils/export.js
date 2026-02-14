@@ -1,13 +1,3 @@
-/**
- * ========================================
- * MODULE D'EXPORT - PDF & EXCEL
- * ========================================
- * 
- * Permet d'exporter des données en :
- * - PDF (rapports, factures, listes)
- * - Excel/CSV (tableaux, statistiques)
- * - Images (graphiques)
- */
 
 /**
  * Exporte des données en PDF
