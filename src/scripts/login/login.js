@@ -1,21 +1,33 @@
-import { API_URL } from "../../data/apiUrl.js";
-import { render } from "../utils/render.js";
+/**
+ * ========================================
+ * PAGE DE CONNEXION - VERSION CORRIGÉE
+ * ========================================
+ */
 
+import { API_URL } from "../../data/apiUrl.js";
+
+// Vérifier si déjà connecté
 const token = localStorage.getItem("token");
 if (token) {
   const role = localStorage.getItem("role");
   if (role === "ADMIN") {
-    window.location.replace("./index.html#/");
+    window.location.replace("./admin.html");
   } else {
     window.location.replace("./user.html");
   }
 }
 
+/**
+ * Toggle password visibility
+ */
 function togglePasswordVisibility() {
   const passwordInput = document.querySelector('#loginPassword');
   const toggleIcon = document.querySelector(".toggle-password i");
   
-  if (!passwordInput || !toggleIcon) return;
+  if (!passwordInput || !toggleIcon) {
+    console.warn("⚠️ Éléments password non trouvés");
+    return;
+  }
 
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
@@ -28,17 +40,10 @@ function togglePasswordVisibility() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.querySelector('.toggle-password');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', togglePasswordVisibility);
-  }
-});
-
-document.querySelector('.toggle-password')?.addEventListener('click', togglePasswordVisibility);
-
-// Gestion de la soumission du formulaire
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
+/**
+ * Gestion de la soumission du formulaire
+ */
+async function handleLogin(e) {
   e.preventDefault();
 
   const email = document.getElementById("loginEmail").value.trim();
@@ -62,30 +67,56 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Erreur login");
+    
+    if (!res.ok) {
+      throw new Error(data.error || "Erreur de connexion");
+    }
 
+    // Sauvegarder les informations
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.user.role);
+    localStorage.setItem("userId", data.user.id);
 
-    render("#/");
+    console.log("✅ Connexion réussie:", data.user.role);
 
-    setTimeout(() => {
-      if (data.user.role === "ADMIN") {
-        window.location.replace("./admin.html#/");
-      } else {
-        window.location.replace("./user.html");
-      }
-    }, 0);
+    // Rediriger selon le rôle
+    if (data.user.role === "ADMIN") {
+      window.location.replace("./admin.html");
+    } else {
+      window.location.replace("./user.html");
+    }
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erreur login:", err);
     alert("Impossible de se connecter : " + err.message);
 
-    // En cas d'erreur, réactiver le bouton
+    // Réactiver le bouton
     if (loginButton && buttonText && spinner) {
       loginButton.disabled = false;
       buttonText.style.display = "inline";
       spinner.style.display = "none";
     }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("📄 DOM chargé, initialisation login...");
+
+  // Toggle password
+  const toggleBtn = document.querySelector('.toggle-password');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', togglePasswordVisibility);
+    console.log("✅ Toggle password activé");
+  } else {
+    console.warn("⚠️ Bouton toggle password non trouvé");
+  }
+
+  // Login form
+  const loginForm = document.getElementById("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", handleLogin);
+    console.log("✅ Formulaire login activé");
+  } else {
+    console.warn("⚠️ Formulaire login non trouvé");
   }
 });
