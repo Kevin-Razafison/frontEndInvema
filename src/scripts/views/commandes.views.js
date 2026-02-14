@@ -12,6 +12,7 @@
  */
 
 import { API_ENDPOINTS, apiFetch, isAuthenticated } from '../../data/apiUrl.js';
+import { renderSection } from '../utils/render.js';
 
 /**
  * Récupère toutes les commandes
@@ -358,6 +359,30 @@ export async function groupOrdersBySupplier() {
   return grouped;
 }
 
+/**
+ * Affiche le panneau des commandes
+ */
+export async function CommandePannel() {
+    const orders = await fetchOrders();
+    return renderSection("commandes-pannel", `
+        <div class="commandes-header">
+            <h2>Gestion des Commandes</h2>
+            <button class="btn-primary" id="create-order-btn">Nouvelle commande</button>
+        </div>
+        <div class="orders-list">
+            ${orders.map(order => `
+                <div class="order-card" data-order-id="${order.id}">
+                    <h3>Commande #${order.id}</h3>
+                    <p><strong>Fournisseur:</strong> ${order.supplier?.name || 'N/A'}</p>
+                    <p><strong>Statut:</strong> <span class="status-badge ${order.status.toLowerCase()}">${getStatusLabel(order.status)}</span></p>
+                    <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                    <p><strong>Articles:</strong> ${order.items?.length || 0}</p>
+                </div>
+            `).join('')}
+        </div>
+    `);
+}
+
 // ========================================
 // FONCTIONS UTILITAIRES
 // ========================================
@@ -421,5 +446,6 @@ export default {
   exportOrdersToCSV,
   downloadOrdersCSV,
   groupOrdersBySupplier,
-  getStatusColor
+  getStatusColor,
+  CommandePannel
 };
