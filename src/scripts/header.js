@@ -10,7 +10,7 @@
  * - Gestion des codes d'erreur
  */
 
-import { API_ENDPOINTS, apiFetch, logout, getUserRole, getUserId } from "../data/apiUrl.js";
+import { API_ENDPOINTS, apiFetch, logout, getUserRole, getUserId } from "../config/apiUrl.js";
 
 // Vérifier l'authentification
 const token = localStorage.getItem("token");

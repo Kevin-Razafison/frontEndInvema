@@ -14,6 +14,7 @@ if (token) {
 function togglePasswordVisibility() {
   const passwordInput = document.querySelector('#loginPassword');
   const toggleIcon = document.querySelector(".toggle-password i");
+  
   if (!passwordInput || !toggleIcon) return;
 
   if (passwordInput.type === "password") {
@@ -26,6 +27,13 @@ function togglePasswordVisibility() {
     toggleIcon.classList.add('fa-eye');
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.querySelector('.toggle-password');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', togglePasswordVisibility);
+  }
+});
 
 document.querySelector('.toggle-password')?.addEventListener('click', togglePasswordVisibility);
 

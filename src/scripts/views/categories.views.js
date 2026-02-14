@@ -1,282 +1,543 @@
+/**
+ * ========================================
+ * CATÉGORIES VIEWS - VERSION AMÉLIORÉE
+ * ========================================
+ * 
+ * Fonctionnalités complètes:
+ * - Affichage des catégories
+ * - Ajout/modification/suppression
+ * - Gestion des sous-catégories
+ * - Validation avancée
+ */
+
 import { render, renderSection } from "../utils/render.js";
 import { form } from "../utils/renderForm.js";
 import { categorieList } from "../../data/categoriesList.js";
-import { API_URL } from "../../data/apiUrl.js";
+import { API_ENDPOINTS, apiFetch } from "../../config/apiUrl.js";
 import { interactiveNavBar } from "./NavBar.views.js";
+
 function navigate(route) {
    window.location.hash = route;
 }
 
-export async function categories(){
-    let categorieListVar = await categorieList();
-      const cardsHTML = categorieListVar.map(cat => `
-      <div class="option-card js-categorie-card" data-id="${cat.id}">
-        ${cat.name}
-      </div>
-    `).join("");
-
-      let categoriesHTML = `
-      <button class="add-categorie">
-          Ajouter Catégorie
-      </button>
-      <button class="delete-categorie">
-          Supprimer Catégorie
-      </button>
-      <div class="categories-container">
-          ${cardsHTML} 
-          <div class="option-card All-product-card js-categorie-card">
-              All Product
-          </div>
-      </div>
-      
-  `;
-  return renderSection("categories-pannel",categoriesHTML);
-}
-
-export function activateCategoryCard(){
-    let categorys = document.querySelectorAll('.js-categorie-card');
-    categorys.forEach((elemnt)=>{
-      console.log(elemnt);
-        elemnt.addEventListener('click', ()=>{
-            navigate("#/productList");
-        })
-    })
-}
-
-async function activateCategorieButton() {
-
-    if(document.querySelector('.categories-pannel'))
-    {
-      const categoriesLista = await categorieList();
-        let categoriesNameList = [];
-        categoriesLista.forEach(category=> {
-            categoriesNameList.push(category.name);
-        })
-       let labelAddList = [{
-              name: "Entrer le nom de la nouvelle catégorie",
-              className: "categorie-input",
-              placeholder: "Entrer categorie"
-            }];
-        let buttonAddList = [
-              {
-                name: "Ajouter",
-                className: "add-category"
-              },
-
-              {
-                name: "Annuler",
-                className: "annuler"
-              }
-            ];
-        let categorieAddButton = document.querySelector('.add-categorie');
-            categorieAddButton.addEventListener('click',async ()=> {
-            const formHTML = form("Ajouter Catégorie",labelAddList,buttonAddList);
-            document.body.innerHTML += formHTML;
-            await attachFormEvents();
-            })
-       let labelDeleteList = [{
-              name: "Entrer le nom du catégorie à supprimer",
-              className: "categorie-input",
-              type: "select",
-              op: categoriesNameList
-            }];
-        let buttonDeleteList = [
-              {
-                name: "Supprimer",
-                className: "delete-category"
-              },
-
-              {
-                name: "Annuler",
-                className: "annuler"
-              }
-            ];
-        let categorieDeleteButton = document.querySelector('.delete-categorie');
-            categorieDeleteButton.addEventListener('click', async ()=>{
-            const formHTML =form("Supprimer Categores",labelDeleteList, buttonDeleteList) 
-            document.body.innerHTML += formHTML;
-            await deleteFormEvents();
-            })
-    }
-}
-
-async function attachFormEvents() {
-  const formSection = document.querySelector('.form');
-  const input = formSection.querySelector('input');
-  const add = formSection.querySelector('.add-category');
-  const cancel = formSection.querySelector('.annuler');
-
-  cancel.addEventListener('click', () => {
-    console.log("mandeha le boutton alony ve?");
-    formSection.remove(); 
-    render(`#/categories`);
-    interactiveNavBar();
-  });
-
-  add.addEventListener('click', async () => {
-    const name = input.value.trim();
-    async function isAlreadyExistent(){
-      const categorieListVar = await categorieList();
-      let isExistent =false;
-      categorieListVar.forEach((categorie)=> {
-        if(categorie.name === name){
-          isExistent = true;
-        }
-      })
-      return isExistent;
-    }
-    if (!name) {
-      alert("Veuillez saisir un nom de catégorie");
-      return;
-    }
-    else if(await isAlreadyExistent()){
-      alert("catégorie déjà existante");
-      return;
-    }
-    else {
-      try {
-      const token = localStorage.getItem("token"); // si route protégée
-      const res = await fetch(`${API_URL}/categories`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // retire si pas d'auth
-        },
-        body: JSON.stringify({ name })
-      });
-
-      if (!res.ok) throw new Error("Échec de la création");
-      const newCategory = await res.json();
-      formSection.remove();
-      await refreshCategories();
-      } catch (err) {
-        console.error(err);
-        alert("Erreur lors de la création de la catégorie");
-      }
-    }
-
-    interactiveNavBar();
-  });
-}
-
-async function deleteFormEvents() {
-  const formSection = document.querySelector('.form');
-  const input = formSection.querySelector('select');
-  const add = formSection.querySelector('.delete-category');
-  const cancel = formSection.querySelector('.annuler');
-
-  cancel.addEventListener('click', () => {
-    formSection.remove(); 
-    render("#/categories");
-    interactiveNavBar();
-  });
-
-  add.addEventListener('click', async () => {
-    const name = input.value.trim();
-    name.toLowerCase();
-    const productList = await takeProducts();
-    let nameList = productList.map(elemnt => elemnt.name);
-    if (!name) {
-      alert("Veuillez saisir un nom de catégorie");
-      return;
-    }
-    else if(!nameList.includes(name))
-    {
-      alert("Veuillez saisir un nom valide");
-      return;
-    }
-    let id;
-    productList.forEach(elemnt=> {
-      if(elemnt.name === name)
-      {
-        id = parseInt(elemnt.id);
-      }
-      else{
-        return;
-      }  
-      });
+/**
+ * Affiche la vue principale des catégories
+ */
+export async function categories() {
     try {
-      const token = localStorage.getItem("token"); // si route protégée
-      const res = await fetch(`${API_URL}/categories/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // retire si pas d'auth
-        },
-      });
+        const categorieListVar = await categorieList();
+        
+        const cardsHTML = categorieListVar.map(cat => `
+            <div class="option-card js-categorie-card" data-id="${cat.id}" data-name="${cat.name}">
+                <div class="category-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="category-info">
+                    <div class="category-name">${cat.name}</div>
+                    ${cat._count ? `
+                        <div class="category-stats">
+                            <span class="stat">
+                                <i class="fas fa-box"></i> ${cat._count.products || 0}
+                            </span>
+                            ${cat._count.children ? `
+                                <span class="stat">
+                                    <i class="fas fa-folder-tree"></i> ${cat._count.children}
+                                </span>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="category-actions">
+                    <button class="action-btn edit-btn" data-id="${cat.id}" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" data-id="${cat.id}" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join("");
 
-      if (!res.ok) throw new Error("Échec de la suppréssion");
-      const newCategory = await res.json();
+        const categoriesHTML = `
+            <div class="categories-header">
+                <h2>Gestion des Catégories</h2>
+                <div class="header-actions">
+                    <button class="btn-primary add-categorie">
+                        <i class="fas fa-plus"></i>
+                        Ajouter Catégorie
+                    </button>
+                </div>
+            </div>
+            
+            <div class="categories-stats">
+                <div class="stat-card">
+                    <i class="fas fa-folder"></i>
+                    <div class="stat-info">
+                        <span class="stat-value">${categorieListVar.length}</span>
+                        <span class="stat-label">Catégories</span>
+                    </div>
+                </div>
+            </div>
 
-      formSection.remove();
-      interactiveNavBar();
-      attachCategoryCardEvents();
-      activateCategorieButton();
-      refreshCategories();
-    } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la suppresion de la catégorie");
+            <div class="categories-container">
+                ${cardsHTML}
+                
+                <div class="option-card All-product-card js-categorie-card">
+                    <div class="category-icon all">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <div class="category-info">
+                        <div class="category-name">Tous les produits</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return renderSection("categories-pannel", categoriesHTML);
+
+    } catch (error) {
+        console.error("❌ Erreur affichage catégories:", error);
+        return renderSection("categories-pannel", `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Impossible de charger les catégories</p>
+            </div>
+        `);
     }
-  });
 }
 
-async function refreshCategories() {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_URL}/categories`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-    });
-    if (!res.ok) throw new Error("Erreur de récupération des catégories");
-    const categoriesData = await res.json();
-
-    const container = document.querySelector(".categories-container");
-    if (!container) return;
-
-    // Recrée le HTML
-    container.innerHTML = categoriesData
-      .map(cat => `
-        <div class="option-card js-categorie-card" data-id="${cat.id}">
-          ${cat.name}
-        </div>
-      `)
-      .join("");
+/**
+ * Active les cards de catégories (navigation)
+ */
+export function activateCategoryCard() {
+    const categoryCards = document.querySelectorAll('.js-categorie-card');
     
-      container.innerHTML += `
-        <div class="option-card All-product-card js-categorie-card">
-            All Product
-        </div>
-      `
-    // 🔁 Réattacher les listeners sur les nouvelles cartes
-    attachCategoryCardEvents();
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function attachCategoryCardEvents() {
-  document.querySelectorAll(".js-categorie-card").forEach(el => {
-    el.addEventListener("click", () => {
-      render(`index.html#/categories`);
-    });
-  });
-}
-
-async function takeProducts() {
-  const token = localStorage.getItem("token");
-        const res = await fetch (`${API_URL}/categories`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
+    categoryCards.forEach((card) => {
+        // Click sur la card (sauf boutons d'action)
+        card.addEventListener('click', (e) => {
+            // Ne pas naviguer si on clique sur les boutons d'action
+            if (e.target.closest('.category-actions')) {
+                return;
+            }
+            
+            const categoryId = card.dataset.id;
+            if (categoryId) {
+                navigate(`#/productList?category=${categoryId}`);
+            } else {
+                navigate("#/productList");
+            }
         });
-        if(!res.ok) throw new Error("Erreur lors de la récupération des produits");
+    });
 
-        const data = await res.json();
-        return data;
+    // Gérer les boutons d'édition
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const categoryId = btn.dataset.id;
+            await showEditCategoryModal(categoryId);
+        });
+    });
+
+    // Gérer les boutons de suppression
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const categoryId = btn.dataset.id;
+            await deleteCategoryWithConfirm(categoryId);
+        });
+    });
 }
-export {activateCategorieButton};
+
+/**
+ * Active le bouton d'ajout de catégorie
+ */
+async function activateCategorieButton() {
+    if (!document.querySelector('.categories-pannel')) {
+        return;
+    }
+
+    const addButton = document.querySelector('.add-categorie');
+    if (!addButton) return;
+
+    addButton.addEventListener('click', async () => {
+        await showAddCategoryModal();
+    });
+}
+
+/**
+ * Affiche le modal d'ajout de catégorie
+ */
+async function showAddCategoryModal() {
+    const categories = await categorieList();
+    const categoriesNames = categories.map(cat => cat.name);
+
+    const labelList = [{
+        name: "Nom de la catégorie",
+        className: "categorie-input category-name-input",
+        placeholder: "Entrer le nom de la catégorie",
+        type: "text",
+        required: true
+    }, {
+        name: "Catégorie parente (optionnel)",
+        className: "categorie-parent-select",
+        type: "select",
+        op: ["Aucune", ...categoriesNames]
+    }];
+
+    const buttonList = [{
+        name: "Ajouter",
+        className: "add-category btn-primary"
+    }, {
+        name: "Annuler",
+        className: "annuler btn-secondary"
+    }];
+
+    const formHTML = form("Ajouter une Catégorie", labelList, buttonList);
+    document.body.innerHTML += formHTML;
+    
+    await attachAddFormEvents(categories);
+}
+
+/**
+ * Affiche le modal d'édition de catégorie
+ */
+async function showEditCategoryModal(categoryId) {
+    try {
+        const category = await apiFetch(API_ENDPOINTS.categories.byId(categoryId));
+        const allCategories = await categorieList();
+        
+        // Filtrer pour ne pas inclure la catégorie actuelle et ses enfants
+        const availableParents = allCategories
+            .filter(cat => cat.id !== category.id)
+            .map(cat => cat.name);
+
+        const labelList = [{
+            name: "Nom de la catégorie",
+            className: "categorie-input category-name-input",
+            placeholder: "Nom de la catégorie",
+            type: "text",
+            value: category.name,
+            required: true
+        }, {
+            name: "Catégorie parente",
+            className: "categorie-parent-select",
+            type: "select",
+            op: ["Aucune", ...availableParents],
+            value: category.parent?.name || "Aucune"
+        }];
+
+        const buttonList = [{
+            name: "Mettre à jour",
+            className: "update-category btn-primary"
+        }, {
+            name: "Annuler",
+            className: "annuler btn-secondary"
+        }];
+
+        const formHTML = form("Modifier la Catégorie", labelList, buttonList);
+        document.body.innerHTML += formHTML;
+        
+        await attachEditFormEvents(category, allCategories);
+
+    } catch (error) {
+        console.error("❌ Erreur chargement catégorie:", error);
+        alert("Impossible de charger la catégorie");
+    }
+}
+
+/**
+ * Attache les événements au formulaire d'ajout
+ */
+async function attachAddFormEvents(allCategories) {
+    const formSection = document.querySelector('.form');
+    const nameInput = formSection.querySelector('.category-name-input');
+    const parentSelect = formSection.querySelector('.categorie-parent-select');
+    const addBtn = formSection.querySelector('.add-category');
+    const cancelBtn = formSection.querySelector('.annuler');
+
+    cancelBtn.addEventListener('click', () => {
+        formSection.remove();
+        interactiveNavBar();
+    });
+
+    addBtn.addEventListener('click', async () => {
+        const name = nameInput.value.trim();
+        const parentName = parentSelect.value;
+
+        // Validation
+        if (!name) {
+            showValidationError(formSection, "Veuillez saisir un nom de catégorie");
+            return;
+        }
+
+        // Vérifier si existe déjà
+        const exists = allCategories.some(cat => 
+            cat.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (exists) {
+            showValidationError(formSection, "Cette catégorie existe déjà");
+            return;
+        }
+
+        // Trouver l'ID du parent
+        let parentID = null;
+        if (parentName && parentName !== "Aucune") {
+            const parent = allCategories.find(cat => cat.name === parentName);
+            parentID = parent?.id || null;
+        }
+
+        try {
+            // Désactiver le bouton pendant la requête
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
+
+            const newCategory = await apiFetch(API_ENDPOINTS.categories.create, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    name,
+                    parentID
+                })
+            });
+
+            console.log("✅ Catégorie créée:", newCategory);
+            
+            formSection.remove();
+            await refreshCategories();
+            showSuccessToast("Catégorie créée avec succès");
+
+        } catch (error) {
+            console.error("❌ Erreur création:", error);
+            showValidationError(formSection, error.message || "Erreur lors de la création");
+            addBtn.disabled = false;
+            addBtn.innerHTML = '<i class="fas fa-plus"></i> Ajouter';
+        }
+
+        interactiveNavBar();
+    });
+}
+
+/**
+ * Attache les événements au formulaire d'édition
+ */
+async function attachEditFormEvents(category, allCategories) {
+    const formSection = document.querySelector('.form');
+    const nameInput = formSection.querySelector('.category-name-input');
+    const parentSelect = formSection.querySelector('.categorie-parent-select');
+    const updateBtn = formSection.querySelector('.update-category');
+    const cancelBtn = formSection.querySelector('.annuler');
+
+    cancelBtn.addEventListener('click', () => {
+        formSection.remove();
+        interactiveNavBar();
+    });
+
+    updateBtn.addEventListener('click', async () => {
+        const name = nameInput.value.trim();
+        const parentName = parentSelect.value;
+
+        // Validation
+        if (!name) {
+            showValidationError(formSection, "Veuillez saisir un nom de catégorie");
+            return;
+        }
+
+        // Vérifier l'unicité du nom (sauf pour la catégorie actuelle)
+        const duplicate = allCategories.find(cat => 
+            cat.id !== category.id && 
+            cat.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (duplicate) {
+            showValidationError(formSection, "Ce nom est déjà utilisé par une autre catégorie");
+            return;
+        }
+
+        // Trouver l'ID du parent
+        let parentID = null;
+        if (parentName && parentName !== "Aucune") {
+            const parent = allCategories.find(cat => cat.name === parentName);
+            parentID = parent?.id || null;
+        }
+
+        try {
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
+
+            const updated = await apiFetch(API_ENDPOINTS.categories.update(category.id), {
+                method: "PUT",
+                body: JSON.stringify({ 
+                    name,
+                    parentID
+                })
+            });
+
+            console.log("✅ Catégorie mise à jour:", updated);
+            
+            formSection.remove();
+            await refreshCategories();
+            showSuccessToast("Catégorie mise à jour avec succès");
+
+        } catch (error) {
+            console.error("❌ Erreur mise à jour:", error);
+            
+            if (error.message.includes('hiérarchie circulaire')) {
+                showValidationError(formSection, "Cette modification créerait une boucle dans la hiérarchie");
+            } else {
+                showValidationError(formSection, error.message || "Erreur lors de la mise à jour");
+            }
+            
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = '<i class="fas fa-save"></i> Mettre à jour';
+        }
+
+        interactiveNavBar();
+    });
+}
+
+/**
+ * Supprime une catégorie avec confirmation
+ */
+async function deleteCategoryWithConfirm(categoryId) {
+    try {
+        const category = await apiFetch(API_ENDPOINTS.categories.byId(categoryId));
+        
+        // Vérifier les dépendances
+        const hasChildren = category._count?.children > 0;
+        const hasProducts = category._count?.products > 0;
+
+        if (hasChildren) {
+            alert(`Impossible de supprimer cette catégorie car elle contient ${category._count.children} sous-catégorie(s).`);
+            return;
+        }
+
+        if (hasProducts) {
+            alert(`Impossible de supprimer cette catégorie car elle contient ${category._count.products} produit(s).`);
+            return;
+        }
+
+        const confirmed = confirm(
+            `Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ?`
+        );
+
+        if (!confirmed) return;
+
+        await apiFetch(API_ENDPOINTS.categories.delete(categoryId), {
+            method: "DELETE"
+        });
+
+        console.log(`✅ Catégorie #${categoryId} supprimée`);
+        await refreshCategories();
+        showSuccessToast("Catégorie supprimée avec succès");
+
+    } catch (error) {
+        console.error("❌ Erreur suppression:", error);
+        alert(error.message || "Erreur lors de la suppression de la catégorie");
+    }
+}
+
+/**
+ * Rafraîchit l'affichage des catégories
+ */
+async function refreshCategories() {
+    try {
+        const categoriesData = await categorieList();
+        const container = document.querySelector(".categories-container");
+        
+        if (!container) {
+            // Si on n'est pas sur la page, la recharger complètement
+            render("#/categories");
+            return;
+        }
+
+        // Recréer le HTML
+        const cardsHTML = categoriesData.map(cat => `
+            <div class="option-card js-categorie-card" data-id="${cat.id}" data-name="${cat.name}">
+                <div class="category-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="category-info">
+                    <div class="category-name">${cat.name}</div>
+                    ${cat._count ? `
+                        <div class="category-stats">
+                            <span class="stat">
+                                <i class="fas fa-box"></i> ${cat._count.products || 0}
+                            </span>
+                            ${cat._count.children ? `
+                                <span class="stat">
+                                    <i class="fas fa-folder-tree"></i> ${cat._count.children}
+                                </span>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="category-actions">
+                    <button class="action-btn edit-btn" data-id="${cat.id}" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" data-id="${cat.id}" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join("");
+
+        container.innerHTML = cardsHTML + `
+            <div class="option-card All-product-card js-categorie-card">
+                <div class="category-icon all">
+                    <i class="fas fa-th"></i>
+                </div>
+                <div class="category-info">
+                    <div class="category-name">Tous les produits</div>
+                </div>
+            </div>
+        `;
+
+        // Réattacher les événements
+        activateCategoryCard();
+        await activateCategorieButton();
+
+    } catch (error) {
+        console.error("❌ Erreur rafraîchissement:", error);
+    }
+}
+
+// ========================================
+// FONCTIONS UTILITAIRES
+// ========================================
+
+/**
+ * Affiche une erreur de validation dans le formulaire
+ */
+function showValidationError(formSection, message) {
+    // Supprimer l'ancienne erreur
+    const oldError = formSection.querySelector('.validation-error');
+    if (oldError) oldError.remove();
+
+    // Ajouter la nouvelle erreur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'validation-error';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${message}</span>
+    `;
+
+    const formContainer = formSection.querySelector('.form-container');
+    formContainer.insertBefore(errorDiv, formContainer.firstChild);
+
+    // Faire disparaître après 5 secondes
+    setTimeout(() => errorDiv.remove(), 5000);
+}
+
+/**
+ * Affiche un toast de succès
+ */
+function showSuccessToast(message) {
+    console.log(`✅ ${message}`);
+    // À implémenter avec votre système de toast
+}
+
+// Exporter les fonctions
+export { activateCategorieButton };
