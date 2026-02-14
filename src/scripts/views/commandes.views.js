@@ -11,7 +11,7 @@
  * - Filtrage et recherche
  */
 
-import { API_ENDPOINTS, apiFetch, isAuthenticated } from '../data/apiUrl.js';
+import { API_ENDPOINTS, apiFetch, isAuthenticated } from '../../data/apiUrl';
 
 /**
  * Récupère toutes les commandes
