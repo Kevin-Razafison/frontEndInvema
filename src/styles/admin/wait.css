@@ -1,38 +1,77 @@
+/* ========================================
+   ÉCRAN DE CHARGEMENT
+   ======================================== */
+
 .wait-screen {
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255,255,255,0.95);
+    background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 9999;
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
+
+.wait-screen.hiding {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ========================================
+   CONTAINER DU LOADER
+   ======================================== */
 
 .loader-container {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
 }
 
+/* Logo (optionnel) */
+.loader-container .logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+/* ========================================
+   LOADER ANIMÉ
+   ======================================== */
+
 .loader {
-    display: inline-block;
     position: relative;
     width: 80px;
     height: 80px;
+    display: inline-block;
 }
 
 .loader div {
     position: absolute;
-    border: 4px solid #4CAF50;
+    border: 4px solid #3498db;
     opacity: 1;
     border-radius: 50%;
-    animation: loaderAnimation 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    animation: loaderAnimation 1.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
 }
 
 .loader div:nth-child(2) {
-    animation-delay: -0.5s;
+    animation-delay: -0.6s;
+    border-color: #2ecc71;
+}
+
+.loader div:nth-child(3) {
+    animation-delay: -0.3s;
+    border-color: #e74c3c;
 }
 
 @keyframes loaderAnimation {
@@ -41,14 +80,14 @@
         left: 36px;
         width: 0;
         height: 0;
-        opacity: 0;
+        opacity: 1;
     }
     50% {
         width: 72px;
         height: 72px;
-        top: 0px;
-        left: 0px;
-        opacity: 1;
+        top: 0;
+        left: 0;
+        opacity: 0.8;
     }
     100% {
         width: 0;
@@ -59,9 +98,248 @@
     }
 }
 
+/* ========================================
+   VARIANTES DE LOADER
+   ======================================== */
+
+/* Loader spinner simple */
+.loader.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(52, 152, 219, 0.2);
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loader dots */
+.loader.dots {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.loader.dots div {
+    width: 15px;
+    height: 15px;
+    background-color: #3498db;
+    border-radius: 50%;
+    position: static;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loader.dots div:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loader.dots div:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   TEXTE DE CHARGEMENT
+   ======================================== */
+
 .loading-text {
     margin-top: 20px;
     font-size: 18px;
-    color: #4CAF50;
-    font-weight: bold;
+    font-weight: 600;
+    color: #2c3e50;
+    letter-spacing: 0.5px;
+}
+
+.loading-subtext {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 400;
+}
+
+/* Animation du texte */
+.loading-text.animated::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% {
+        content: '';
+    }
+    40% {
+        content: '.';
+    }
+    60% {
+        content: '..';
+    }
+    80%, 100% {
+        content: '...';
+    }
+}
+
+/* ========================================
+   BARRE DE PROGRESSION
+   ======================================== */
+
+.progress-container {
+    width: 300px;
+    height: 4px;
+    background-color: rgba(52, 152, 219, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
+    border-radius: 2px;
+    width: 0;
+    animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+    0% {
+        width: 0;
+    }
+    50% {
+        width: 70%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   SPINNER ALTERNATIF (Pulse)
+   ======================================== */
+
+.loader.pulse {
+    width: 60px;
+    height: 60px;
+    background-color: #3498db;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 500px) {
+    .loader {
+        width: 60px;
+        height: 60px;
+    }
+
+    .loader div {
+        border-width: 3px;
+    }
+
+    .loading-text {
+        font-size: 16px;
+    }
+
+    .loading-subtext {
+        font-size: 13px;
+    }
+
+    .progress-container {
+        width: 250px;
+    }
+
+    .loader-container .logo {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ========================================
+   OVERLAY SEMI-TRANSPARENT (pour chargement partiel)
+   ======================================== */
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: inherit;
+}
+
+.loading-overlay .loader {
+    width: 40px;
+    height: 40px;
+}
+
+.loading-overlay .loader div {
+    border-width: 3px;
+}
+
+/* ========================================
+   SKELETON LOADING (optionnel)
+   ======================================== */
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 8px;
+}
+
+.skeleton-title {
+    height: 24px;
+    width: 60%;
+    margin-bottom: 16px;
+}
+
+.skeleton-image {
+    height: 200px;
+    width: 100%;
 }

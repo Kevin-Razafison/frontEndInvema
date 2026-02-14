@@ -1,89 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="INVEMA - Système de gestion d'inventaire professionnel">
+    <meta name="theme-color" content="#142536">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="./src/images/logo.png">
-    <title>INVEMA</title>
-    <link rel="stylesheet" href="src/styles/admin/popUp.css">
-    <link rel="stylesheet" href="src/styles/admin/fournisseurPannel.css">
-    <link rel="stylesheet" href="src/styles/admin/form.css">
-    <link rel="stylesheet" href="src/styles/admin/product.css">
-    <link rel="stylesheet" href="src/styles/admin/utilisateurs-pannel.css">
-    <link rel="stylesheet" href="src/styles/admin/commandes.css">
-    <link rel="stylesheet" href="src/styles/admin/fournisseurs.css">
-    <link rel="stylesheet" href="src/styles/admin/categories.css">
-    <link rel="stylesheet" href="src/styles/admin/dashboard.css">
+    <link rel="apple-touch-icon" href="./src/images/logo.png">
+    
+    <title>INVEMA - Administration</title>
+    
+    <!-- Styles CSS -->
     <link rel="stylesheet" href="src/styles/admin/index.css">
     <link rel="stylesheet" href="src/styles/admin/header.css">
     <link rel="stylesheet" href="src/styles/admin/nav.css">
-    <link rel="stylesheet" href="src/styles/admin/index.css">
+    <link rel="stylesheet" href="src/styles/admin/dashboard.css">
+    <link rel="stylesheet" href="src/styles/admin/categories.css">
+    <link rel="stylesheet" href="src/styles/admin/product.css">
     <link rel="stylesheet" href="src/styles/admin/productInfo.css">
+    <link rel="stylesheet" href="src/styles/admin/fournisseurs.css">
+    <link rel="stylesheet" href="src/styles/admin/fournisseurPannel.css">
+    <link rel="stylesheet" href="src/styles/admin/commandes.css">
+    <link rel="stylesheet" href="src/styles/admin/utilisateurs-pannel.css">
+    <link rel="stylesheet" href="src/styles/admin/form.css">
+    <link rel="stylesheet" href="src/styles/admin/popUp.css">
     <link rel="stylesheet" href="src/styles/admin/wait.css">
+    
+    <!-- Bibliothèques externes (charger depuis CDN) -->
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- jsPDF pour l'export PDF (chargé dynamiquement si nécessaire) -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script> -->
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Écran de chargement initial -->
+    <div class="wait-screen" id="initialLoader">
+        <div class="loader-container">
+            <div class="loader">
+                <div></div>
+                <div></div>
+            </div>
+            <p class="loading-text">Chargement de l'application</p>
+        </div>
+    </div>
+
+    <!-- En-tête -->
     <header>
         <div class="left-section">
-            <div class="hamburger-menu">
-                <img src="./src/icons/icons-menu.png" alt="menu">
+            <!-- Menu hamburger (mobile) -->
+            <div class="hamburger-menu" id="menuToggle" aria-label="Menu de navigation">
+                <img src="./src/icons/icons-menu.png" alt="Menu">
             </div>
+            
+            <!-- Logo et titre -->
             <div class="logo-container">
-                <img src="./src/images/logo.png" alt="logo.png" class="logo-image">
-                <div class="board">ADMIN</div>
+                <img src="./src/images/logo.png" alt="Logo INVEMA" class="logo-image">
+                <span class="board">ADMINISTRATION</span>
             </div>
         </div>
+        
         <div class="right-section">
-        <button class="logout-button">se deconnecter</button> <!-- ajout -->
-        <div class="notification-container">
-            <img src="./src/icons/notification-icon.png" alt="notification">
-            <div class="notification-dropdown"></div> <!-- ajout -->
-        </div>
+            <!-- Recherche globale -->
+            <div class="global-search">
+                <input 
+                    type="search" 
+                    placeholder="🔍 Recherche rapide..." 
+                    id="globalSearch"
+                    aria-label="Recherche globale"
+                />
+            </div>
+            
+            <!-- Notifications -->
+            <div class="notification-container">
+                <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+                    <img src="./src/icons/notification-icon.png" alt="Notifications">
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        <button class="mark-all-read" id="markAllRead">Tout marquer comme lu</button>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        <!-- Les notifications seront insérées ici dynamiquement -->
+                    </div>
+                    <div class="notification-footer">
+                        <a href="#/notifications">Voir toutes les notifications</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profil utilisateur -->
+            <div class="user-profile-menu">
+                <button class="profile-btn" id="profileBtn" aria-label="Profil utilisateur">
+                    <div class="user-avatar" id="userAvatar">
+                        <span id="userInitials">AD</span>
+                    </div>
+                    <span class="user-name" id="userName">Admin</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <span id="profileInitials">AD</span>
+                        </div>
+                        <div class="profile-details">
+                            <div class="profile-name" id="profileName">Administrateur</div>
+                            <div class="profile-email" id="profileEmail">admin@invema.mg</div>
+                        </div>
+                    </div>
+                    <div class="profile-menu">
+                        <a href="#/profile" class="profile-menu-item">
+                            <i class="fas fa-user"></i>
+                            <span>Mon profil</span>
+                        </a>
+                        <a href="#/settings" class="profile-menu-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Paramètres</span>
+                        </a>
+                        <hr class="profile-menu-divider">
+                        <button class="profile-menu-item logout-button" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
-    <nav>
-        <section class="nav-button dashboard-button">
-            <img src="./src/icons/icons-dashboard.png" alt="dashboard">
-             <div>
-                Tableau de bord
-             </div>
-        </section>
-        <section class="nav-button categories-button">
-            <img src="./src/icons/icons-data-sheet.png" alt="catégories">
-            <div>
-                Categories
-            </div>
-        </section>
-        <section class="nav-button fournisseurs-button">
-            <img src="src/icons/icons-erp-system.png" alt="Fournisseurs">
-            <div>
-                Fournisseurs
-            </div>
-        </section>
-        <section class="nav-button commandes-button">
-            <img src="src/icons/icons-cart.png" alt="Commandes"> 
-            <div>
-                Commandes
-            </div>
-        </section>
-        <section class="nav-button utilisateurs-button">
-            <img src="src/icons/icons-users.png" alt="Utilisateurs">
-            <div>
-                Gestion Utilisateurs
-            </div>
-        </section>
-                <section class="nav-button product-button">
-            <img src="src/icons/icons-product.png" alt="product">
-            <div>
-                Liste des produits
-            </div>
-        </section>
-    </nav>
-    <main id="main">
 
+    <!-- Navigation latérale -->
+    <nav id="sidebar" role="navigation" aria-label="Navigation principale">
+        <section class="nav-button dashboard-button isNavActive" data-route="#/dashboard" data-tooltip="Tableau de bord">
+            <img src="./src/icons/icons-dashboard.png" alt="Tableau de bord">
+            <div>Tableau de bord</div>
+        </section>
+        
+        <div class="nav-separator"></div>
+        
+        <section class="nav-button product-button" data-route="#/productList" data-tooltip="Produits">
+            <img src="src/icons/icons-product.png" alt="Produits">
+            <div>Produits</div>
+            <span class="nav-badge" id="productsCount">0</span>
+        </section>
+        
+        <section class="nav-button categories-button" data-route="#/categories" data-tooltip="Catégories">
+            <img src="./src/icons/icons-data-sheet.png" alt="Catégories">
+            <div>Catégories</div>
+        </section>
+        
+        <div class="nav-separator"></div>
+        
+        <section class="nav-button commandes-button" data-route="#/commandes" data-tooltip="Commandes">
+            <img src="src/icons/icons-cart.png" alt="Commandes">
+            <div>Commandes</div>
+            <span class="nav-badge" id="ordersCount">0</span>
+        </section>
+        
+        <section class="nav-button fournisseurs-button" data-route="#/fournisseurs" data-tooltip="Fournisseurs">
+            <img src="src/icons/icons-erp-system.png" alt="Fournisseurs">
+            <div>Fournisseurs</div>
+        </section>
+        
+        <div class="nav-separator"></div>
+        
+        <section class="nav-button utilisateurs-button" data-route="#/utilisateur" data-tooltip="Utilisateurs">
+            <img src="src/icons/icons-users.png" alt="Utilisateurs">
+            <div>Utilisateurs</div>
+        </section>
+        
+        <div class="nav-footer">
+            <small>INVEMA v2.0.0</small>
+        </div>
+    </nav>
+
+    <!-- Overlay pour navigation mobile -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- Contenu principal -->
+    <main id="main" role="main">
+        <!-- Le contenu sera inséré dynamiquement ici -->
     </main>
-    <div id="app"></div>
-  <div id="popup-container"></div>
+
+    <!-- Container pour les modals -->
+    <div id="modalContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Container pour les popups -->
+    <div id="popupContainer" aria-live="assertive" aria-atomic="true"></div>
+
+    <!-- Container pour les notifications toast -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Scripts -->
     <script type="module" src="./src/scripts/index.js"></script>
     <script type="module" src="./src/scripts/header.js"></script>
+    
+    <!-- Script pour masquer le loader initial -->
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('initialLoader');
+            if (loader) {
+                loader.classList.add('hiding');
+                setTimeout(() => loader.remove(), 300);
+            }
+        });
+        
+        // Gestion des erreurs globales
+        window.addEventListener('error', (event) => {
+            console.error('❌ Erreur globale:', event.error);
+        });
+        
+        // Gestion des promesses non gérées
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('❌ Promesse rejetée non gérée:', event.reason);
+        });
+    </script>
+    
+    <!-- Service Worker pour PWA (optionnel) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('✅ Service Worker enregistré'))
+                .catch(err => console.log('❌ Erreur Service Worker:', err));
+        }
+    </script>
 </body>
 </html>

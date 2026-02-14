@@ -1,48 +1,338 @@
-body .popUp {
-    z-index: 999;
-    width: 350px;
-    height: 250px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+/* ========================================
+   SYSTÈME DE POPUP/MODAL
+   ======================================== */
+
+/* Overlay de fond */
+body .popup-overlay {
     position: fixed;
-    top: 20%;
-    left: 40%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 9998;
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Container principal du popup */
+body .popUp {
+    position: relative;
+    width: 400px;
+    max-width: 90vw;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: flex;
     flex-direction: column;
-    gap: 25px;
-    background-color: white;
-    border-radius: 5px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
 }
-body .popUp .message{
-    font-size: 10px;
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
-body .popUp .pop-up-button-container{
-    width: 100%;
+
+/* ========================================
+   HEADER DU POPUP
+   ======================================== */
+
+body .popUp .popup-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body .popUp .popup-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+body .popUp .popup-header .close-button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+}
+
+body .popUp .popup-header .close-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+/* ========================================
+   CORPS DU POPUP
+   ======================================== */
+
+body .popUp .popup-body {
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Icône du popup */
+body .popUp .popup-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+body .popUp .popup-icon.success {
+    background-color: #d4edda;
+    color: #28a745;
+}
+
+body .popUp .popup-icon.error {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+body .popUp .popup-icon.warning {
+    background-color: #fff3cd;
+    color: #ffc107;
+}
+
+body .popUp .popup-icon.info {
+    background-color: #d1ecf1;
+    color: #17a2b8;
+}
+
+/* Titre du message */
+body .popUp .popup-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Message principal */
+body .popUp .message {
+    text-align: center;
+    font-size: 14px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========================================
+   FOOTER AVEC BOUTONS
+   ======================================== */
+
+body .popUp .popup-footer {
+    padding: 0 25px 25px;
+}
+
+body .popUp .pop-up-button-container {
+    display: flex;
     gap: 12px;
+    justify-content: center;
 }
-body .popUp .pop-up-button-container button{
-    padding: 12px 15px;
-    color: white;
-    border-radius: 10px;
+
+body .popUp .pop-up-button-container button {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
     border: none;
-    background-color: red;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
 }
-body .popUp .pop-up-button-container button :hover{
-    opacity: 0.7;
+
+/* Bouton d'annulation */
+body .popUp .pop-up-button-container .annuler {
+    background-color: #6c757d;
+    color: white;
 }
-body .popUp .pop-up-button-container button :active{
-    opacity: 0.5;
+
+body .popUp .pop-up-button-container .annuler:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-body .popUp .pop-up-button-container .confirmer{
-    background-color: green;
+
+body .popUp .pop-up-button-container .annuler:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
-body .popUp .pop-up-button-container .confirmer :hover{
-    opacity:  0.7;
+
+/* Bouton de confirmation */
+body .popUp .pop-up-button-container .confirmer {
+    background-color: #28a745;
+    color: white;
 }
-body .popUp .pop-up-button-container .confirmer :active{
-    opacity: 0.5;
+
+body .popUp .pop-up-button-container .confirmer:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body .popUp .pop-up-button-container .confirmer:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Bouton de suppression */
+body .popUp .pop-up-button-container .supprimer {
+    background-color: #dc3545;
+    color: white;
+}
+
+body .popUp .pop-up-button-container .supprimer:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body .popUp .pop-up-button-container .supprimer:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ========================================
+   VARIANTES DE POPUP
+   ======================================== */
+
+/* Popup de confirmation */
+body .popUp.confirmation {
+    max-width: 450px;
+}
+
+/* Popup d'alerte */
+body .popUp.alert {
+    max-width: 400px;
+}
+
+body .popUp.alert .pop-up-button-container {
+    justify-content: center;
+}
+
+body .popUp.alert .pop-up-button-container button {
+    min-width: 120px;
+}
+
+/* Popup de formulaire */
+body .popUp.form {
+    max-width: 500px;
+}
+
+body .popUp.form .popup-body {
+    gap: 15px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 500px) {
+    body .popUp {
+        width: 95vw;
+        margin: 0 auto;
+    }
+
+    body .popUp .popup-header {
+        padding: 15px 20px;
+    }
+
+    body .popUp .popup-header h3 {
+        font-size: 16px;
+    }
+
+    body .popUp .popup-body {
+        padding: 20px 20px;
+    }
+
+    body .popUp .popup-footer {
+        padding: 0 20px 20px;
+    }
+
+    body .popUp .pop-up-button-container {
+        flex-direction: column;
+    }
+
+    body .popUp .pop-up-button-container button {
+        width: 100%;
+    }
+
+    body .popUp .popup-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    body .popUp .popup-title {
+        font-size: 18px;
+    }
+
+    body .popUp .message {
+        font-size: 13px;
+    }
+}
+
+/* ========================================
+   ANIMATIONS DE FERMETURE
+   ======================================== */
+
+body .popUp.closing {
+    animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+}
+
+body .popup-overlay.closing {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
 }

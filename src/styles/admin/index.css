@@ -1,41 +1,145 @@
-*{
+/* ========================================
+   STYLES GLOBAUX - ADMIN DASHBOARD
+   ======================================== */
+
+/* Reset et configuration de base */
+* {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     transition: all ease-in-out 0.15s;
 }
-* button {
+
+*:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+button {
     cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
 }
 
-body{
+/* Configuration du body */
+body {
     background-color: #d9dbdd;
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
+    overflow-x: hidden;
 }
 
+/* Container principal */
+main {
+    margin-left: 250px;
+    margin-top: 60px;
+    padding: 25px;
+    min-height: calc(100vh - 60px);
+    transition: margin-left 0.3s ease;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Tablettes et petits écrans */
 @media (max-width: 1306px) {
-    nav section div{
+    /* Navigation condensée */
+    nav section div {
         display: none;
-    };
-
-    body nav{
-        width: 100px;
-    };
-    body nav section{
-        width: 70%
     }
-    main{
-        margin-left: -150px;
+
+    body nav {
+        width: 100px;
+    }
+
+    body nav section {
+        width: 70%;
+    }
+
+    main {
+        margin-left: 100px;
     }
 }
 
-@media(max-width: 500px){
+/* Mobile */
+@media (max-width: 500px) {
+    /* Cache la navigation sur mobile */
     nav {
+        width: 0;
+        display: none;
+        transform: translateX(-100%);
+    }
+
+    /* Navigation mobile visible avec classe */
+    nav.mobile-visible {
+        display: block;
+        transform: translateX(0);
+        width: 250px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    /* Overlay pour fermer la nav mobile */
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
         display: none;
     }
-    
+
+    .nav-overlay.active {
+        display: block;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 320px) {
     main {
-        left: 40%;
+        padding: 10px;
+    }
+}
+
+/* ========================================
+   UTILITAIRES
+   ======================================== */
+
+/* Classes utilitaires pour l'accessibilité */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Animation de chargement globale */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Désactiver les animations pour ceux qui préfèrent */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
