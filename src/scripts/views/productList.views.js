@@ -717,5 +717,15 @@ function activateSelectAll() {
 export { 
     productList as default,
     refreshProductList,
+    activateProductSearch,
+    activateProductFilter,
+    activateProductSort,
+    activateViewToggle,
+    activateClearFilters,
+    activateProductCardEvent,
+    activateAjouterProductButton,
+    activateProductDeleteButton,  
+    activateExportButtons,
+    activateSelectAll,
     attachAllEvents as activateProductListEvents
 };
