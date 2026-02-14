@@ -9,7 +9,7 @@
  * - Gestion des permissions
  */
 
-import { API_URL, getAuthHeaders, isAuthenticated } from '../config/apiUrl.js';
+import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
 
 /**
  * Récupère la liste complète des utilisateurs
