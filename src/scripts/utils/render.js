@@ -1,10 +1,10 @@
 import { views } from "../route/route.js";
 import { activateCategorieButton, activateCategoryCard } from "../views/categories.views.js";
-import { CommandePannelUpdate } from "../views/commandes.views.js";
+// import { CommandePannelUpdate } from "../views/commandes.views.js"; // À décommenter si implémenté
 import { activateFournisseursButton, addFournisseur } from "../views/fournisseurs.views.js";
 import { addUsers, activeDeleteButton, filter, modifyButton } from "../views/gestionUtilisateur.views.js";
 import { interactiveNavBar } from "../views/NavBar.views.js";
-import {  activateAjouterProductButton, activateProductFilter, activateProductDeleteButton, activateProductSearch, activateProductCardEvent } from "../views/productList.views.js";
+import { activateAjouterProductButton, activateProductFilter, activateProductDeleteButton, activateProductSearch, activateProductCardEvent, activateProductListEvents } from "../views/productList.views.js";
 import { previousButton, modifierButton, SupprimerButton } from "./renderFournisseur.js";
 import { modifierProductButton, SupprimerProductButton, previousProductButton } from "./renderProducInfo.js";
 
@@ -33,7 +33,7 @@ export function render(route, id = 0) {
     return;
   }
 
-  if (payload.role === "ADMIN") {
+  if (payload.role === "ADMIN" || payload.role === "MAGASINIER") {
     if (route === "#/categories") {
       (async () => {
         main.innerHTML = await view();
@@ -41,7 +41,7 @@ export function render(route, id = 0) {
         activateCategoryCard();
       })();
     } 
-    else if (route === "#/dashboard" || route==="#/") {
+    else if (route === "#/dashboard" || route === "#/") {
       (async () => {
         main.innerHTML = await view(); 
         interactiveNavBar();
@@ -55,67 +55,71 @@ export function render(route, id = 0) {
         await SupprimerButton();
       })();
     } 
-    else if(route === "#/utilisateur"){
-      main.innerHTML = view();
-      addUsers();
-      modifyButton();
-      activeDeleteButton();
-      filter("ADMIN","admin-filter");
-      filter("EMPLOYE","employe-filter");
-      filter("ALL", "all-filter");
+    else if (route === "#/utilisateur") {
+      (async () => {
+        main.innerHTML = await view();
+        addUsers();
+        modifyButton();
+        activeDeleteButton();
+        filter("ADMIN", "admin-filter");
+        filter("EMPLOYE", "employe-filter");
+        filter("ALL", "all-filter");
+      })();
     }
-    else if(route === "#/productList"){
-      (async ()=> {
+    else if (route === "#/productList") {
+      (async () => {
         main.innerHTML = await view();
         await activateProductSearch();
         activateAjouterProductButton();
         activateProductFilter();
-        activateProductCardEvent()
+        activateProductCardEvent();
         interactiveNavBar();
       })();
     }
-    else if(route === "#/productList/Pannel"){
-      (async ()=> {
-        main.innerHTML = await view();
+    else if (route === "#/productList/Pannel") {
+      (async () => {
+        main.innerHTML = await view(id);
         modifierProductButton();
         SupprimerProductButton();
         previousProductButton();      
       })();
     }
     else if (route === "#/commandes") {
-    (async () => {
+      (async () => {
         main.innerHTML = await view(); 
-        CommandePannelUpdate();
+        // CommandePannelUpdate(); // À implémenter
       })();
     }
-    else if(route === "#/fournisseurs") {
-      (async ()=> {
-        setTimeout(async()=>main.innerHTML = await view(),0);
-        setTimeout(async()=> await addFournisseur(),0);
-        setTimeout(()=>activateFournisseursButton()); 
+    else if (route === "#/fournisseurs") {
+      (async () => {
+        main.innerHTML = await view();
+        await addFournisseur();
+        activateFournisseursButton();
         interactiveNavBar();
       })();
     }
-    else{
+    else {
       main.innerHTML = view();
     }
   } 
   else if (payload.role === "EMPLOYE") {
     if (route === "#/simpleUser") {
-        (async ()=> {
+      (async () => {
         main.innerHTML = await view();
-        activateAjouterProductButton();
+        activateProductSearch();
         activateProductFilter();
-        activateProductCardEvent()
+        activateProductCardEvent();
         interactiveNavBar();
       })();
     }
-      else if(route === "#/productList/Pannel"){
-      (async ()=> {
-        main.innerHTML = await view();
-        SupprimerProductButton();
+    else if (route === "#/productList/Pannel") {
+      (async () => {
+        main.innerHTML = await view(id);
         previousProductButton();      
       })();
+    }
+    else {
+      main.innerHTML = view();
     }
   }
 }
@@ -154,7 +158,6 @@ export function initRouter() {
     render(hash, id);
   }
 
-  // ✅ Initialise la nav bar une seule fois
   interactiveNavBar();
 
   window.addEventListener("hashchange", loadRoute);
@@ -162,8 +165,6 @@ export function initRouter() {
 
   loadRoute();
 }
-
-
 
 export function renderSection(className = "", htmlElement = "") {
   return `

@@ -9,15 +9,15 @@ import { productList } from "../views/productList.views.js";
 import { waitView } from "../utils/wait.js";
 
 export const views = {
-    "#/" :  ()=> `${ waitView()}`,
-    "#/simpleUser" : async()=> `${await productList()}`,   
-    "#/categories" : async () => `${await categories()}`,
-    "#/commandes" : async () => `${ await CommandePannel()}`,
-    "#/dashboard" : async () => `${ await DashBoard()}`,
+    "#/": async () => `${await DashBoard()}`, // dashboard par défaut pour admin
+    "#/simpleUser": async () => `${await productList()}`,   
+    "#/categories": async () => `${await categories()}`,
+    "#/commandes": async () => `${await CommandePannel()}`,
+    "#/dashboard": async () => `${await DashBoard()}`,
     "#/fournisseurs": () => `${fournisseurs()}`,
-    "#/utilisateur" : () => `${gestionUtilisateur()}`,
-    "#/categories/productList": async() => `${await productList()}`,
+    "#/utilisateur": async () => `${await gestionUtilisateur()}`,
+    "#/categories/productList": async () => `${await productList()}`,
     "#/productList": async () => `${await productList()}`,
-    "#/fournisseurs/pannel": async (id) => `${ await renderFournisseur(id)}`,
-    "#/productList/Pannel" : async (id) => `${await renderProduct(id)}`
-} 
+    "#/fournisseurs/pannel": async (id) => `${await renderFournisseur(id)}`,
+    "#/productList/Pannel": async (id) => `${await renderProduct(id)}`
+};

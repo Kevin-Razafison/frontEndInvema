@@ -10,10 +10,10 @@
  * - Animations
  */
 
-import { afficheCards } from "../../data/Dashboard.js";
 import { fetchProducts } from "../../data/product.js";
 import { fetchRequests } from "../../data/request.js";
 import { Users } from "../../data/Users.js";
+import { fetchOrders } from "./commandes.views.js"; // on va utiliser cette fonction
 import { renderSection } from "../utils/render.js";
 
 /**
@@ -25,14 +25,15 @@ export async function DashBoard() {
         showLoadingState();
 
         // Récupérer toutes les données en parallèle pour meilleures performances
-        const [stock, requests, users] = await Promise.all([
+        const [stock, requests, users, orders] = await Promise.all([
             fetchProducts(),
             fetchRequests(),
-            Users()
+            Users(),
+            fetchOrders()
         ]);
 
         // Calculer les statistiques
-        const stats = calculateStatistics(stock, requests, users);
+        const stats = calculateStatistics(stock, requests, users, orders);
 
         // Générer le HTML
         const html = `
@@ -53,15 +54,12 @@ export async function DashBoard() {
 /**
  * Calcule toutes les statistiques nécessaires
  */
-function calculateStatistics(stock, requests, users) {
-    // Stocks faibles (alertLevel >= 3)
-    const lowStocks = stock.filter(p => p.alertLevel >= 3);
+function calculateStatistics(stock, requests, users, orders) {
+    // Stocks faibles (quantity <= alertLevel)
+    const lowStocks = stock.filter(p => p.quantity <= p.alertLevel);
 
     // Commandes en attente
-    const pendingOrders = stock.filter(p => {
-        if (!p.orderItems) return false;
-        return p.orderItems.some(oi => oi.order && oi.order.status === "PENDING");
-    });
+    const pendingOrders = orders.filter(o => o.status === "PENDING");
 
     // Requêtes en attente
     const pendingRequests = requests.filter(r => r.status === "PENDING");
@@ -182,7 +180,7 @@ function calculateStockByCategory(stock) {
 function renderOverviewSection(stats) {
     const cards = [
         {
-            title: "STOCKS ÉPUISÉS",
+            title: "STOCKS FAIBLES",
             value: stats.lowStocks,
             icon: "icons-low-priority.png",
             color: "#e74c3c",
@@ -196,7 +194,7 @@ function renderOverviewSection(stats) {
             trend: "warning"
         },
         {
-            title: "NOUVELLES REQUÊTES",
+            title: "REQUÊTES EN ATTENTE",
             value: stats.pendingRequests,
             icon: "icons-arrow-up.png",
             color: "#3498db",
@@ -429,7 +427,9 @@ function getStatusBadge(status) {
     const badges = {
         'PENDING': '<span class="status-badge pending">En attente</span>',
         'APPROVED': '<span class="status-badge approved">Approuvée</span>',
-        'REJECTED': '<span class="status-badge rejected">Rejetée</span>'
+        'REJECTER': '<span class="status-badge rejected">Rejetée</span>',
+        'PREPARED': '<span class="status-badge prepared">Préparée</span>',
+        'PICKEDUP': '<span class="status-badge pickedup">Récupérée</span>'
     };
     return badges[status] || '<span class="status-badge">Inconnu</span>';
 }
@@ -441,7 +441,9 @@ function getStatusIcon(status) {
     const icons = {
         'PENDING': '⏳',
         'APPROVED': '✅',
-        'REJECTED': '❌'
+        'REJECTER': '❌',
+        'PREPARED': '📦',
+        'PICKEDUP': '🚚'
     };
     return icons[status] || '❓';
 }
