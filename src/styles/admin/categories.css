@@ -1,4 +1,4 @@
-main{
+main {
     position: absolute;
     left: 300px;
     top: 100px;
@@ -9,8 +9,7 @@ main{
     flex-direction: column;
 }
 
-
-main .categories-pannel{
+main .categories-pannel {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -19,7 +18,7 @@ main .categories-pannel{
     padding-bottom: 35px;
 }
 
-main .categories-container{
+main .categories-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 35px;
@@ -29,7 +28,8 @@ main .categories-container{
     padding-left: 5px;
     margin-bottom: 35px;
 }
-main .categories-container .option-card{
+
+main .categories-container .option-card {
     background-color: white;
     color: black;
     width: 300px;
@@ -47,14 +47,14 @@ main .categories-container .option-card{
     margin-bottom: 35px;
 }
 
-main .categories-container .option-card:hover{
+main .categories-container .option-card:hover {
     opacity: 0.7;
 }
-main .categories-container .option-card:active{
+main .categories-container .option-card:active {
     opacity: 0.5;
 }
 
-main section .add-categorie{
+main section .add-categorie {
     border: none;
     background-color: #142536;
     padding: 12px;
@@ -67,10 +67,10 @@ main section .add-categorie{
     left: 15px;
 }
 
-main section .delete-categorie{
+main section .delete-categorie {
     display: flex;
     border: none;
-    background-color:  rgb(218, 21, 21);
+    background-color: rgb(218, 21, 21);
     padding: 12px;
     border-radius: 5px;
     font-weight: bold;
@@ -82,14 +82,14 @@ main section .delete-categorie{
     margin-left: 25px;
 }
 
-main section .add-categorie:hover{
+main section .add-categorie:hover {
     opacity: 0.7;
 }
-main section .add-categorie:active{
+main section .add-categorie:active {
     opacity: 0.7;
 }
 
-main section .search-bar{
+main section .search-bar {
     margin-bottom: 20px;
     width: 300px;
     height: 30px;
@@ -97,36 +97,35 @@ main section .search-bar{
     border-radius: 3px;
     border: none;
     box-shadow: 1px 1px 10px rgba(78, 74, 74, 0.5);
-
 }
 
 @media (max-width:1000px) {
-    main .categories-container{
+    main .categories-container {
         grid-template-columns: 1fr 1fr;
     }
 }
-@media (max-width:900px){
-    main .categories-container .option-card{
+@media (max-width:900px) {
+    main .categories-container .option-card {
         width: 200px;
     }
 }
-@media (max-width: 550px){
-    main section .delete-categorie{
+@media (max-width: 550px) {
+    main section .delete-categorie {
         top: 25px;
         left: 0;
     }
-    main .categories-container{
+    main .categories-container {
         margin-top: 150px;
     }
 }
 @media (max-width: 500px) {
-    main .categories-container{
+    main .categories-container {
         grid-template-columns: 1fr;
     }
-    main .categories-container .option-card{
+    main .categories-container .option-card {
         width: 250px;
     }
-    main section .delete-categorie{
+    main section .delete-categorie {
         margin-left: 15px;
     }
 }

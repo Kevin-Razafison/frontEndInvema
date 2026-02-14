@@ -1,15 +1,15 @@
-main .order-management-container{
+main .order-management-container {
     width: 1300px;
     height: 100%;
 }
 
-main .order-management-container .order-management-title{
+main .order-management-container .order-management-title {
     font-size: 30px;
     font-weight: bold;
     margin-bottom: 25px;
 }
 
-main .order-management-container .categories-order{
+main .order-management-container .categories-order {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -17,7 +17,7 @@ main .order-management-container .categories-order{
     justify-content: start;
 }
 
-main .order-management-container .categories-choice{
+main .order-management-container .categories-choice {
     display: flex;
     width: 200px;
     justify-content: space-between;
@@ -30,7 +30,7 @@ main .order-management-container .categories-choice{
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
 }
 
-main .order-management-container .categories-choice .div-button{
+main .order-management-container .categories-choice .div-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,7 +40,7 @@ main .order-management-container .categories-choice .div-button{
     margin-right: 12px;
     cursor: pointer;
 }
-main .order-management-container .historique-command-button{
+main .order-management-container .historique-command-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,11 +50,11 @@ main .order-management-container .historique-command-button{
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
-main .order-management-container .historique-command-button:active{
+main .order-management-container .historique-command-button:active {
     opacity: 0.7;
 }
 
-main .categories-choice .underline{
+main .categories-choice .underline {
     position: absolute;
     bottom: 0px;
     height: 2px;
@@ -62,7 +62,7 @@ main .categories-choice .underline{
     background-color: blue;
 }
 
-main .order-management-container .part{
+main .order-management-container .part {
     width: 90%;
     height: 400px;
     margin-top: 35px;
@@ -71,7 +71,7 @@ main .order-management-container .part{
     margin-bottom: 50px;
 }
 
-main .order-management-container .part .title-row{
+main .order-management-container .part .title-row {
     display: grid;
     grid-template-columns: 200px 100px 200px 100px 50px 50px 50px;
     column-gap: 50px;
@@ -82,7 +82,7 @@ main .order-management-container .part .title-row{
     color: #494949;
 }
 
-main .order-management-container .part .row-container{
+main .order-management-container .part .row-container {
     border-radius: 12px;
     width: 93%;
     margin-left: 10px;
@@ -90,11 +90,11 @@ main .order-management-container .part .row-container{
     overflow: scroll;
 }
 
-main .order-management-container .part .title-row .stock{
+main .order-management-container .part .title-row .stock {
     display: flex;
     justify-content: center;
 }
-main .order-management-container .part .row{
+main .order-management-container .part .row {
     display: grid;
     grid-template-columns: 200px 100px 200px 100px 100px 10px 50px;
     column-gap: 50px;
@@ -103,42 +103,41 @@ main .order-management-container .part .row{
     color: #494949;
     margin-bottom: 12px;
 }
-main .order-management-container .part .row .stock-count{
+main .order-management-container .part .row .stock-count {
     display: flex;
     justify-content: center;
 }
 
-
-main .order-management-container .part .row .order-id{
+main .order-management-container .part .row .order-id {
     width: 100%;
     display: flex;
 }
 
-main .order-management-container .part .order-id .id{
+main .order-management-container .part .order-id .id {
     width: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-main .order-management-container .part .row .row-content{
+main .order-management-container .part .row .row-content {
     display: flex;
     align-items: center;
 }
 
-main .order-id .name-product{
+main .order-id .name-product {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-main .second-part .title-part{
+main .second-part .title-part {
     padding-top: 12px;
     padding-left: 12px;
     font-weight: bold;
 }
 
-.second-part .row-container{
+.second-part .row-container {
     overflow: scroll;
 }
 
@@ -238,4 +237,3 @@ main .second-part .title-part{
 .div-button.active ~ .underline {
     transform: translateX(var(--underline-x, 0px));
 }
-

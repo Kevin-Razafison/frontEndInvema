@@ -9,15 +9,14 @@ body .form {
     overflow: auto;
 }
 
-.fomr-img-container{
+.fomr-img-container {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
-
 }
 
-body .form .back-ground{
+body .form .back-ground {
     position: fixed;
     width: 100%;
     height: 100%;
@@ -26,7 +25,7 @@ body .form .back-ground{
     background-color: black;
 }
 
-body .form .form-container{
+body .form .form-container {
     z-index: 201;
     display: flex;
     flex-direction: column;
@@ -41,66 +40,74 @@ body .form .form-container{
     color: white;
 }
 
-input::file-selector-button{
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 5px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-right: 15px;
+input::file-selector-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 15px;
 }
-body .form .form-container .title{
+
+body .form .form-container .title {
     margin-bottom: 12px;
     font-weight: bold;
 }
+
 .form-container img {
     width: 200px;
     height: 50px;
-    
 }
 
-body .form .form-container .input div{
+body .form .form-container .input div {
     margin-bottom: 12px;
     margin-top: 12px;
 }
-body .form .form-container .input input{
+
+body .form .form-container .input input {
     padding-left: 12px;
     margin-bottom: 12px;
     width: 250px;
     height: 30px;
     border-radius: 5px;
-    border:  none;
+    border: none;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
-body .form .form-container .button-container{
+
+body .form .form-container .button-container {
     margin-top: 25px;
     width: 100%;
     display: flex;
     align-items: start;
     justify-content: space-evenly;
 }
-body .form .form-container .button{
+
+body .form .form-container .button {
     padding: 10px 15px;
     font-weight: bold;
     border: none;
     border-radius: 3px;
     cursor: pointer;
 }
-body .form .form-container .add-category{
+
+body .form .form-container .add-category {
     background-color: rgb(72, 143, 72);
     color: white;
 }
-body .form .form-container .delete-category{
+
+body .form .form-container .delete-category {
     background-color: rgb(209, 164, 164);
     color: white;
 }
-body .form .form-container .annuler{
+
+body .form .form-container .annuler {
     background-color: rgb(218, 21, 21);
     color: white;
 }
-body .form select{
+
+body .form select {
     background-color: white;
     width: 250px;
     height: 30px;
@@ -116,7 +123,8 @@ body .form select{
 body .form .input {
     position: relative;
 }
-body .form .icons{
+
+body .form .icons {
     position: absolute;
     top: 40%;
     right: -25px;

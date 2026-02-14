@@ -92,6 +92,43 @@ header .right-section {
     height: 100%;
 }
 
+/* Recherche globale */
+header .right-section .global-search {
+    position: relative;
+}
+
+header .right-section .global-search input {
+    width: 250px;
+    height: 36px;
+    border-radius: 18px;
+    border: none;
+    padding: 0 40px 0 15px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+header .right-section .global-search input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+header .right-section .global-search input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.25);
+    width: 300px;
+}
+
+header .right-section .global-search:after {
+    content: '🔍';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    opacity: 0.7;
+}
+
 /* Container de notifications */
 header .right-section .notification-container {
     position: relative;
@@ -130,7 +167,249 @@ header .right-section .notification-container .notification-badge {
     border: 2px solid #142536;
 }
 
-/* Bouton de déconnexion */
+/* Dropdown de notifications */
+.notification-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1001;
+}
+
+.notification-dropdown .notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-dropdown .notification-header h3 {
+    font-size: 16px;
+    color: #333;
+}
+
+.notification-dropdown .notification-header .mark-all-read {
+    background: none;
+    border: none;
+    color: #3498db;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f9f9f9;
+}
+
+.notification-item .notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-item .notification-icon.approved {
+    background: #d4edda;
+    color: #27ae60;
+}
+
+.notification-item .notification-icon.rejecter {
+    background: #fee;
+    color: #e74c3c;
+}
+
+.notification-item .notification-content {
+    flex: 1;
+}
+
+.notification-item .notification-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+.notification-item .notification-details {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: #888;
+}
+
+.notification-item .notification-action {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.notification-item .notification-action:hover {
+    color: #3498db;
+}
+
+.notification-footer {
+    padding: 10px 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.notification-footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.notification-empty {
+    padding: 30px;
+    text-align: center;
+    color: #aaa;
+}
+
+.notification-empty i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+/* Profil utilisateur */
+header .right-section .user-profile-menu {
+    position: relative;
+}
+
+header .right-section .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+header .right-section .profile-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+header .right-section .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+header .right-section .user-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 250px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1001;
+}
+
+.profile-dropdown .profile-info {
+    display: flex;
+    gap: 12px;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-dropdown .profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #3498db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.profile-dropdown .profile-details {
+    flex: 1;
+}
+
+.profile-dropdown .profile-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.profile-dropdown .profile-email {
+    font-size: 12px;
+    color: #888;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.profile-menu-item:hover {
+    background: #f5f5f5;
+}
+
+.profile-menu-item i {
+    width: 20px;
+    color: #888;
+}
+
+.profile-menu-divider {
+    margin: 5px 0;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+/* Bouton de déconnexion (ancien) */
 header .right-section .logout-button {
     padding: 8px 20px;
     background-color: rgba(255, 255, 255, 0.1);
@@ -154,35 +433,6 @@ header .right-section .logout-button:active {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Profil utilisateur (optionnel) */
-header .right-section .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 12px;
-    border-radius: 25px;
-    background-color: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-header .right-section .user-profile:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
-header .right-section .user-profile img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-header .right-section .user-profile .user-name {
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-}
-
 /* ========================================
    RESPONSIVE
    ======================================== */
@@ -200,9 +450,12 @@ header .right-section .user-profile .user-name {
         gap: 10px;
     }
 
-    header .right-section .logout-button {
-        padding: 6px 15px;
-        font-size: 13px;
+    header .right-section .global-search input {
+        width: 180px;
+    }
+
+    header .right-section .global-search input:focus {
+        width: 200px;
     }
 }
 
@@ -220,12 +473,11 @@ header .right-section .user-profile .user-name {
         display: none;
     }
 
-    header .right-section .logout-button {
-        padding: 6px 12px;
-        font-size: 12px;
+    header .right-section .global-search {
+        display: none;
     }
 
-    header .right-section .user-profile .user-name {
+    header .right-section .user-name {
         display: none;
     }
 }
@@ -233,9 +485,5 @@ header .right-section .user-profile .user-name {
 @media (max-width: 320px) {
     header {
         padding: 0 10px;
-    }
-
-    header .right-section .notification-container {
-        padding: 5px;
     }
 }
