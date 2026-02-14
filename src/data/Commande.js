@@ -2,6 +2,7 @@
 
 
 // Fonction pour fetch les commandes depuis ton backend
+import { API_URL } from "./apiUrl";
 export async function fetchOrders() {
     const token = localStorage.getItem("token");
 if (!token) {
@@ -11,7 +12,7 @@ if (!token) {
 
     try {
         const token = localStorage.getItem("token"); // JWT si authentifié
-        const res = await fetch("http://localhost:4000/api/orders", {
+        const res = await fetch(`${API_URL}/orders`, {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`

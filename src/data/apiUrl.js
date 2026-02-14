@@ -24,9 +24,9 @@ const API_ENDPOINTS = {
     // ========================================
     auth: {
         login: `${API_URL}/auth/login`,
-        me: `${API_URL}/auth/me`,              // ✅ NOUVEAU - Profil utilisateur
-        logout: `${API_URL}/auth/logout`,      // ✅ NOUVEAU - Déconnexion
-        refresh: `${API_URL}/auth/refresh`     // ✅ NOUVEAU - Rafraîchir token
+        me: `${API_URL}/auth/me`,              
+        logout: `${API_URL}/auth/logout`,      
+        refresh: `${API_URL}/auth/refresh`     
     },
 
     // ========================================
