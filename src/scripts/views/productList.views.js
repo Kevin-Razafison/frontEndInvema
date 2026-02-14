@@ -512,7 +512,7 @@ function renderErrorState() {
 /**
  * Rafraîchit la liste des produits
  */
-export async function refreshProductList() {
+ async function refreshProductList() {
     productsCache = await fetchProducts();
     const container = document.querySelector(".product-list-container");
     if (container) {
