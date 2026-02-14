@@ -13,7 +13,7 @@
 import { render, renderSection } from "../utils/render.js";
 import { form } from "../utils/renderForm.js";
 import { categorieList } from "../../data/categoriesList.js";
-import { API_ENDPOINTS, apiFetch } from "../../config/apiUrl.js";
+import { API_ENDPOINTS, apiFetch } from "../../data/apiUrl.js";
 import { interactiveNavBar } from "./NavBar.views.js";
 
 function navigate(route) {
