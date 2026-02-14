@@ -9,11 +9,11 @@
  * - Gestion des informations de contact
  */
 
-import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
+import { API_ENDPOINTS, apiFetch, isAuthenticated, getImageUrl } from './apiUrl.js';
 
 /**
  * Récupère la liste complète des fournisseurs
- * @param {Object} filters - Filtres optionnels
+ * @param {Object} filters - Filtres optionnels (search, type)
  * @returns {Promise<Array>} Liste des fournisseurs
  */
 export async function fournisseursCards(filters = {}) {
@@ -25,39 +25,24 @@ export async function fournisseursCards(filters = {}) {
     }
 
     try {
-        // Construire l'URL avec les filtres
-        let url = `${API_URL}/supplier`;
-        const queryParams = new URLSearchParams();
+        // Note: l'API ne supporte pas les filtres de recherche, on filtre côté client
+        let suppliers = await apiFetch(API_ENDPOINTS.suppliers.base);
 
         if (filters.search) {
-            queryParams.append('search', filters.search);
+            const term = filters.search.toLowerCase();
+            suppliers = suppliers.filter(s => 
+                s.name.toLowerCase().includes(term) ||
+                s.email?.toLowerCase().includes(term) ||
+                s.category?.toLowerCase().includes(term)
+            );
         }
+
         if (filters.type) {
-            queryParams.append('type', filters.type);
+            suppliers = suppliers.filter(s => s.category === filters.type);
         }
 
-        if (queryParams.toString()) {
-            url += `?${queryParams.toString()}`;
-        }
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        // Gérer les erreurs HTTP
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.error('🔒 Session expirée');
-                redirectToLogin();
-                return [];
-            }
-            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(`✅ ${data.length} fournisseur(s) récupéré(s)`);
-        return data;
+        console.log(`✅ ${suppliers.length} fournisseur(s) récupéré(s)`);
+        return suppliers;
 
     } catch (error) {
         console.error('❌ Erreur lors de la récupération des fournisseurs:', error);
@@ -78,20 +63,7 @@ export async function fetchSupplierById(supplierId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/supplier/${supplierId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.warn(`⚠️ Fournisseur #${supplierId} non trouvé`);
-                return null;
-            }
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const supplier = await response.json();
+        const supplier = await apiFetch(API_ENDPOINTS.suppliers.byId(supplierId));
         console.log(`✅ Fournisseur #${supplierId} récupéré:`, supplier.name);
         return supplier;
 
@@ -102,55 +74,22 @@ export async function fetchSupplierById(supplierId) {
 }
 
 /**
- * Crée un nouveau fournisseur
- * @param {Object} supplierData - Données du fournisseur à créer
- * @param {string} supplierData.name - Nom du fournisseur
- * @param {string} [supplierData.type] - Type de fourniture
- * @param {string} [supplierData.contact] - Numéro de contact
- * @param {string} [supplierData.email] - Email
- * @param {string} [supplierData.address] - Adresse
+ * Crée un nouveau fournisseur avec image (FormData)
+ * @param {FormData} formData - Données du fournisseur avec champ image
  * @returns {Promise<Object|null>} Le fournisseur créé ou null en cas d'erreur
  */
-export async function createSupplier(supplierData) {
+export async function createSupplier(formData) {
     if (!isAuthenticated()) {
         redirectToLogin();
         return null;
     }
 
     try {
-        // Validation des données obligatoires
-        if (!supplierData.name || supplierData.name.trim().length === 0) {
-            throw new Error('Le nom du fournisseur est obligatoire');
-        }
-
-        // Validation de l'email si fourni
-        if (supplierData.email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(supplierData.email)) {
-                throw new Error('Format d\'email invalide');
-            }
-        }
-
-        // Validation du numéro de téléphone si fourni
-        if (supplierData.contact) {
-            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-            if (!phoneRegex.test(supplierData.contact)) {
-                throw new Error('Format de numéro de téléphone invalide');
-            }
-        }
-
-        const response = await fetch(`${API_URL}/supplier`, {
+        const newSupplier = await apiFetch(API_ENDPOINTS.suppliers.create, {
             method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(supplierData)
+            body: formData // FormData, donc pas de Content-Type
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
-        }
-
-        const newSupplier = await response.json();
         console.log(`✅ Fournisseur créé: ${newSupplier.name} (ID: ${newSupplier.id})`);
         showSuccessNotification(`Fournisseur "${newSupplier.name}" créé avec succès`);
         return newSupplier;
@@ -163,46 +102,23 @@ export async function createSupplier(supplierData) {
 }
 
 /**
- * Met à jour un fournisseur existant
- * @param {number|string} supplierId - ID du fournisseur à modifier
- * @param {Object} updatedData - Nouvelles données du fournisseur
- * @returns {Promise<Object|null>} Le fournisseur mis à jour ou null en cas d'erreur
+ * Met à jour un fournisseur existant avec image optionnelle
+ * @param {number|string} supplierId - ID du fournisseur
+ * @param {FormData} formData - Données mises à jour
+ * @returns {Promise<Object|null>} Le fournisseur mis à jour ou null
  */
-export async function updateSupplier(supplierId, updatedData) {
+export async function updateSupplier(supplierId, formData) {
     if (!isAuthenticated()) {
         redirectToLogin();
         return null;
     }
 
     try {
-        // Validation de l'email si fourni
-        if (updatedData.email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(updatedData.email)) {
-                throw new Error('Format d\'email invalide');
-            }
-        }
-
-        // Validation du numéro de téléphone si fourni
-        if (updatedData.contact) {
-            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-            if (!phoneRegex.test(updatedData.contact)) {
-                throw new Error('Format de numéro de téléphone invalide');
-            }
-        }
-
-        const response = await fetch(`${API_URL}/supplier/${supplierId}`, {
+        const updatedSupplier = await apiFetch(API_ENDPOINTS.suppliers.update(supplierId), {
             method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(updatedData)
+            body: formData
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
-        }
-
-        const updatedSupplier = await response.json();
         console.log(`✅ Fournisseur #${supplierId} mis à jour`);
         showSuccessNotification('Fournisseur mis à jour avec succès');
         return updatedSupplier;
@@ -226,15 +142,9 @@ export async function deleteSupplier(supplierId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/supplier/${supplierId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
+        await apiFetch(API_ENDPOINTS.suppliers.delete(supplierId), {
+            method: 'DELETE'
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
-        }
 
         console.log(`✅ Fournisseur #${supplierId} supprimé`);
         showSuccessNotification('Fournisseur supprimé avec succès');
@@ -285,101 +195,13 @@ export async function fetchProductsBySupplier(supplierId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/supplier/${supplierId}/products`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const products = await response.json();
-        console.log(`✅ ${products.length} produit(s) trouvé(s) pour ce fournisseur`);
-        return products;
+        // L'API ne fournit pas d'endpoint dédié, on récupère tous les produits et on filtre
+        const products = await apiFetch(API_ENDPOINTS.products.base);
+        return products.filter(p => p.supplierId === Number(supplierId));
 
     } catch (error) {
         console.error('❌ Erreur lors de la récupération des produits du fournisseur:', error);
         return [];
-    }
-}
-
-/**
- * Upload d'un logo pour un fournisseur
- * @param {File} logoFile - Fichier logo à uploader
- * @param {number|string} supplierId - ID du fournisseur
- * @returns {Promise<string|null>} URL du logo ou null en cas d'erreur
- */
-export async function uploadSupplierLogo(logoFile, supplierId) {
-    if (!isAuthenticated()) {
-        redirectToLogin();
-        return null;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('logo', logoFile);
-
-        const response = await fetch(`${API_URL}/supplier/${supplierId}/logo`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-                // Ne pas définir Content-Type pour FormData
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Erreur lors de l\'upload du logo');
-        }
-
-        const data = await response.json();
-        console.log('✅ Logo uploadé avec succès');
-        showSuccessNotification('Logo mis à jour');
-        return data.logoUrl;
-
-    } catch (error) {
-        console.error('❌ Erreur lors de l\'upload du logo:', error);
-        showErrorNotification('Impossible d\'uploader le logo');
-        return null;
-    }
-}
-
-/**
- * Récupère les statistiques d'un fournisseur
- * @param {number|string} supplierId - ID du fournisseur
- * @returns {Promise<Object|null>} Statistiques ou null
- */
-export async function getSupplierStats(supplierId) {
-    if (!isAuthenticated()) {
-        redirectToLogin();
-        return null;
-    }
-
-    try {
-        const [supplier, products] = await Promise.all([
-            fetchSupplierById(supplierId),
-            fetchProductsBySupplier(supplierId)
-        ]);
-
-        if (!supplier) {
-            return null;
-        }
-
-        const stats = {
-            id: supplier.id,
-            name: supplier.name,
-            totalProducts: products.length,
-            activeProducts: products.filter(p => p.quantite > 0).length,
-            lowStockProducts: products.filter(p => p.status === 'low').length
-        };
-
-        console.log('📊 Statistiques du fournisseur:', stats);
-        return stats;
-
-    } catch (error) {
-        console.error('❌ Erreur lors de la récupération des statistiques:', error);
-        return null;
     }
 }
 
@@ -422,7 +244,5 @@ export default {
     deleteSupplier,
     searchSuppliers,
     filterSuppliersByType,
-    fetchProductsBySupplier,
-    uploadSupplierLogo,
-    getSupplierStats
+    fetchProductsBySupplier
 };

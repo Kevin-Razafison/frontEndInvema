@@ -31,11 +31,11 @@ export async function fetchOrders() {
     // Afficher les détails dans la console
     data.forEach(order => {
       console.log(`📦 Commande #${order.id} - Statut: ${order.status}`);
-      console.log(`   Fournisseur: ${order.supplier.name}`);
-      console.log(`   Items: ${order.items.length} article(s)`);
+      console.log(`   Fournisseur: ${order.supplier?.name}`);
+      console.log(`   Items: ${order.items?.length} article(s)`);
       
-      order.items.forEach(item => {
-        console.log(`   - ${item.product.name} x ${item.quantity}`);
+      order.items?.forEach(item => {
+        console.log(`   - ${item.product?.name} x ${item.quantity}`);
       });
     });
 
@@ -244,7 +244,7 @@ export async function searchOrders(searchTerm) {
 
   return allOrders.filter(order => 
     order.id.toString().includes(term) ||
-    order.supplier.name.toLowerCase().includes(term)
+    order.supplier?.name?.toLowerCase().includes(term)
   );
 }
 
@@ -275,7 +275,7 @@ export async function getOrderStats() {
     }
 
     // Compter les items
-    stats.totalItems += order.items.length;
+    stats.totalItems += order.items?.length || 0;
   });
 
   // Commandes récentes (dernières 24h)
@@ -306,10 +306,10 @@ export function exportOrdersToCSV(orders) {
   const rows = orders.map(order => [
     order.id,
     new Date(order.createdAt).toLocaleDateString('fr-FR'),
-    order.supplier.name,
+    order.supplier?.name || '-',
     getStatusLabel(order.status),
-    order.items.length,
-    order.items.reduce((sum, item) => sum + item.quantity, 0)
+    order.items?.length || 0,
+    order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0
   ]);
 
   const csvContent = [

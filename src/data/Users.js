@@ -9,11 +9,11 @@
  * - Gestion des permissions
  */
 
-import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
+import { API_ENDPOINTS, apiFetch, isAuthenticated, getUserId } from './apiUrl.js';
 
 /**
  * Récupère la liste complète des utilisateurs
- * @param {Object} filters - Filtres optionnels (role, status, etc.)
+ * @param {Object} filters - Filtres optionnels (role, search)
  * @returns {Promise<Array>} Liste des utilisateurs
  */
 export async function Users(filters = {}) {
@@ -25,47 +25,22 @@ export async function Users(filters = {}) {
     }
 
     try {
-        // Construire l'URL avec les filtres
-        let url = `${API_URL}/users`;
-        const queryParams = new URLSearchParams();
+        let users = await apiFetch(API_ENDPOINTS.users.base);
 
+        // Filtres côté client
         if (filters.role) {
-            queryParams.append('role', filters.role);
-        }
-        if (filters.status) {
-            queryParams.append('status', filters.status);
+            users = users.filter(u => u.role === filters.role);
         }
         if (filters.search) {
-            queryParams.append('search', filters.search);
+            const term = filters.search.toLowerCase();
+            users = users.filter(u => 
+                u.name.toLowerCase().includes(term) ||
+                u.email.toLowerCase().includes(term)
+            );
         }
 
-        if (queryParams.toString()) {
-            url += `?${queryParams.toString()}`;
-        }
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        // Gérer les erreurs HTTP
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.error('🔒 Session expirée');
-                redirectToLogin();
-                return [];
-            }
-            if (response.status === 403) {
-                console.error('🚫 Accès interdit - Permissions insuffisantes');
-                showErrorNotification('Vous n\'avez pas les permissions nécessaires');
-                return [];
-            }
-            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(`✅ ${data.length} utilisateur(s) récupéré(s)`);
-        return data;
+        console.log(`✅ ${users.length} utilisateur(s) récupéré(s)`);
+        return users;
 
     } catch (error) {
         console.error('❌ Erreur lors de la récupération des utilisateurs:', error);
@@ -86,20 +61,7 @@ export async function fetchUserById(userId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/users/${userId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.warn(`⚠️ Utilisateur #${userId} non trouvé`);
-                return null;
-            }
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const user = await response.json();
+        const user = await apiFetch(API_ENDPOINTS.users.byId(userId));
         console.log(`✅ Utilisateur #${userId} récupéré:`, user.name);
         return user;
 
@@ -120,21 +82,13 @@ export async function fetchCurrentUser() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/users/me`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const user = await response.json();
+        const user = await apiFetch(API_ENDPOINTS.auth.me);
         console.log('✅ Utilisateur actuel récupéré:', user.name);
         
         // Stocker les infos utilisateur dans localStorage
         localStorage.setItem('userId', user.id);
         localStorage.setItem('role', user.role);
+        localStorage.setItem('userName', user.name);
         
         return user;
 
@@ -171,22 +125,15 @@ export async function createUser(userData) {
         }
 
         // Validation du mot de passe
-        if (userData.password.length < 6) {
-            throw new Error('Le mot de passe doit contenir au moins 6 caractères');
+        if (userData.password.length < 8) {
+            throw new Error('Le mot de passe doit contenir au moins 8 caractères');
         }
 
-        const response = await fetch(`${API_URL}/users`, {
+        const newUser = await apiFetch(API_ENDPOINTS.users.create, {
             method: 'POST',
-            headers: getAuthHeaders(),
             body: JSON.stringify(userData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
-        }
-
-        const newUser = await response.json();
         console.log(`✅ Utilisateur créé: ${newUser.name} (ID: ${newUser.id})`);
         showSuccessNotification(`Utilisateur "${newUser.name}" créé avec succès`);
         return newUser;
@@ -211,18 +158,11 @@ export async function updateUser(userId, updatedData) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/users/${userId}`, {
+        const updatedUser = await apiFetch(API_ENDPOINTS.users.update(userId), {
             method: 'PUT',
-            headers: getAuthHeaders(),
             body: JSON.stringify(updatedData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
-        }
-
-        const updatedUser = await response.json();
         console.log(`✅ Utilisateur #${userId} mis à jour`);
         showSuccessNotification('Utilisateur mis à jour avec succès');
         return updatedUser;
@@ -246,22 +186,16 @@ export async function deleteUser(userId) {
     }
 
     // Empêcher la suppression de soi-même
-    const currentUserId = localStorage.getItem('userId');
-    if (userId.toString() === currentUserId) {
+    const currentUserId = getUserId();
+    if (userId.toString() === currentUserId?.toString()) {
         showErrorNotification('Vous ne pouvez pas supprimer votre propre compte');
         return false;
     }
 
     try {
-        const response = await fetch(`${API_URL}/users/${userId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
+        await apiFetch(API_ENDPOINTS.users.delete(userId), {
+            method: 'DELETE'
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
-        }
 
         console.log(`✅ Utilisateur #${userId} supprimé`);
         showSuccessNotification('Utilisateur supprimé avec succès');
@@ -277,7 +211,7 @@ export async function deleteUser(userId) {
 /**
  * Change le rôle d'un utilisateur
  * @param {number|string} userId - ID de l'utilisateur
- * @param {string} newRole - Nouveau rôle ('ADMIN', 'USER', etc.)
+ * @param {string} newRole - Nouveau rôle ('ADMIN', 'MAGASINIER', 'EMPLOYE')
  * @returns {Promise<Object|null>} L'utilisateur mis à jour ou null
  */
 export async function changeUserRole(userId, newRole) {
@@ -286,15 +220,15 @@ export async function changeUserRole(userId, newRole) {
         return null;
     }
 
-    const validRoles = ['ADMIN', 'USER', 'GUEST'];
+    const validRoles = ['ADMIN', 'MAGASINIER', 'EMPLOYE'];
     if (!validRoles.includes(newRole)) {
         showErrorNotification(`Rôle invalide. Valeurs autorisées: ${validRoles.join(', ')}`);
         return null;
     }
 
     // Empêcher de modifier son propre rôle
-    const currentUserId = localStorage.getItem('userId');
-    if (userId.toString() === currentUserId) {
+    const currentUserId = getUserId();
+    if (userId.toString() === currentUserId?.toString()) {
         showErrorNotification('Vous ne pouvez pas modifier votre propre rôle');
         return null;
     }
@@ -303,58 +237,8 @@ export async function changeUserRole(userId, newRole) {
 }
 
 /**
- * Change le statut d'un utilisateur (actif/inactif)
- * @param {number|string} userId - ID de l'utilisateur
- * @param {boolean} isActive - Nouveau statut
- * @returns {Promise<Object|null>} L'utilisateur mis à jour ou null
- */
-export async function changeUserStatus(userId, isActive) {
-    return updateUser(userId, { isActive });
-}
-
-/**
- * Réinitialise le mot de passe d'un utilisateur
- * @param {number|string} userId - ID de l'utilisateur
- * @param {string} newPassword - Nouveau mot de passe
- * @returns {Promise<boolean>} True si réussi, false sinon
- */
-export async function resetUserPassword(userId, newPassword) {
-    if (!isAuthenticated()) {
-        redirectToLogin();
-        return false;
-    }
-
-    if (newPassword.length < 6) {
-        showErrorNotification('Le mot de passe doit contenir au moins 6 caractères');
-        return false;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/users/${userId}/reset-password`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ newPassword })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la réinitialisation');
-        }
-
-        console.log(`✅ Mot de passe de l'utilisateur #${userId} réinitialisé`);
-        showSuccessNotification('Mot de passe réinitialisé avec succès');
-        return true;
-
-    } catch (error) {
-        console.error('❌ Erreur lors de la réinitialisation du mot de passe:', error);
-        showErrorNotification(error.message);
-        return false;
-    }
-}
-
-/**
  * Filtre les utilisateurs par rôle
- * @param {string} role - Rôle à filtrer ('ADMIN', 'USER', etc.)
+ * @param {string} role - Rôle à filtrer ('ADMIN', 'MAGASINIER', 'EMPLOYE')
  * @returns {Promise<Array>} Liste des utilisateurs avec ce rôle
  */
 export async function filterUsersByRole(role) {
@@ -413,8 +297,6 @@ export default {
     updateUser,
     deleteUser,
     changeUserRole,
-    changeUserStatus,
-    resetUserPassword,
     filterUsersByRole,
     searchUsers
 };

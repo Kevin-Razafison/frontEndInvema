@@ -1,325 +1,502 @@
 /**
  * ========================================
- * CONFIGURATION DE L'API - VERSION AMÉLIORÉE
+ * CONFIGURATION API - VERSION COMPLÈTE
+ * Conforme au backend amélioré avec Cloudinary
  * ========================================
- * 
- * Mise à jour pour correspondre aux nouvelles routes backend
  */
+
+// ========================================
+// CONFIGURATION DE BASE
+// ========================================
 
 // URL de base de l'API
-const API_BASE_URL = "https://backentinvema.onrender.com";
+export const API_URL = "https://backentinvema.onrender.com/api";
 
-// URL de l'API
-const API_URL = `${API_BASE_URL}/api`;
+// URL pour les images (legacy - utilisé par anciens fichiers)
+// ⚠️ IMPORTANT : Avec Cloudinary, les URLs d'images viennent directement de l'API
+// Elles sont au format : https://res.cloudinary.com/your-cloud/image/upload/...
+export const API_URLimg = "https://backentinvema.onrender.com";
 
-// URL pour les images (Cloudinary maintenant)
-const API_URL_IMG = API_BASE_URL;
+// ========================================
+// ENDPOINTS ORGANISÉS PAR RESSOURCE
+// ========================================
 
-/**
- * Configuration des endpoints de l'API (mis à jour)
- */
-const API_ENDPOINTS = {
-    // ========================================
-    // AUTHENTIFICATION (routes améliorées)
-    // ========================================
-    auth: {
-        login: `${API_URL}/auth/login`,
-        me: `${API_URL}/auth/me`,              
-        logout: `${API_URL}/auth/logout`,      
-        refresh: `${API_URL}/auth/refresh`     
-    },
+export const API_ENDPOINTS = {
+  // ==================
+  // AUTHENTIFICATION
+  // ==================
+  auth: {
+    login: `${API_URL}/auth/login`,
+    logout: `${API_URL}/auth/logout`,          // ✅ NOUVEAU
+    refresh: `${API_URL}/auth/refresh`,        // ✅ NOUVEAU
+    me: `${API_URL}/auth/me`                   // ✅ NOUVEAU
+  },
 
-    // ========================================
-    // UTILISATEURS
-    // ========================================
-    users: {
-        base: `${API_URL}/users`,
-        byId: (id) => `${API_URL}/users/${id}`,
-        create: `${API_URL}/users`,
-        update: (id) => `${API_URL}/users/${id}`,
-        delete: (id) => `${API_URL}/users/${id}`
-    },
+  // ==================
+  // UTILISATEURS
+  // ==================
+  users: {
+    base: `${API_URL}/users`,
+    byId: (id) => `${API_URL}/users/${id}`,
+    create: `${API_URL}/users`,
+    update: (id) => `${API_URL}/users/${id}`,
+    delete: (id) => `${API_URL}/users/${id}`
+  },
 
-    // ========================================
-    // PRODUITS
-    // ========================================
-    products: {
-        base: `${API_URL}/products`,
-        byId: (id) => `${API_URL}/products/${id}`,
-        create: `${API_URL}/products`,
-        update: (id) => `${API_URL}/products/${id}`,
-        delete: (id) => `${API_URL}/products/${id}`
-    },
+  // ==================
+  // FOURNISSEURS
+  // ==================
+  suppliers: {
+    base: `${API_URL}/supplier`,
+    byId: (id) => `${API_URL}/supplier/${id}`,
+    create: `${API_URL}/supplier`,
+    update: (id) => `${API_URL}/supplier/${id}`,
+    delete: (id) => `${API_URL}/supplier/${id}`
+    // ✅ Note : Les images sont uploadées via FormData avec Cloudinary
+    // Le backend retourne imageUrl: "https://res.cloudinary.com/..."
+  },
 
-    // ========================================
-    // CATÉGORIES
-    // ========================================
-    categories: {
-        base: `${API_URL}/categories`,
-        byId: (id) => `${API_URL}/categories/${id}`,
-        create: `${API_URL}/categories`,
-        update: (id) => `${API_URL}/categories/${id}`,
-        delete: (id) => `${API_URL}/categories/${id}`
-    },
+  // ==================
+  // CATÉGORIES
+  // ==================
+  categories: {
+    base: `${API_URL}/categories`,
+    byId: (id) => `${API_URL}/categories/${id}`,
+    create: `${API_URL}/categories`,
+    update: (id) => `${API_URL}/categories/${id}`,
+    delete: (id) => `${API_URL}/categories/${id}`
+    // ✅ Supporte les sous-catégories via parentID
+    // ✅ Détection automatique des cycles
+  },
 
-    // ========================================
-    // FOURNISSEURS
-    // ========================================
-    suppliers: {
-        base: `${API_URL}/supplier`,
-        byId: (id) => `${API_URL}/supplier/${id}`,
-        create: `${API_URL}/supplier`,
-        update: (id) => `${API_URL}/supplier/${id}`,
-        delete: (id) => `${API_URL}/supplier/${id}`
-    },
+  // ==================
+  // PRODUITS
+  // ==================
+  products: {
+    base: `${API_URL}/products`,
+    byId: (id) => `${API_URL}/products/${id}`,
+    create: `${API_URL}/products`,
+    update: (id) => `${API_URL}/products/${id}`,
+    delete: (id) => `${API_URL}/products/${id}`
+    // ✅ Note : Les images sont uploadées via FormData avec Cloudinary
+    // Le backend retourne imageUrl: "https://res.cloudinary.com/..."
+  },
 
-    // ========================================
-    // REQUÊTES/DEMANDES (routes améliorées)
-    // ========================================
-    requests: {
-        base: `${API_URL}/requests`,
-        byId: (id) => `${API_URL}/requests/${id}`,
-        create: `${API_URL}/requests`,
-        update: (id) => `${API_URL}/requests/${id}`,
-        updateStatus: (id) => `${API_URL}/requests/${id}/status`,  // ⚠️ CHANGÉ
-        delete: (id) => `${API_URL}/requests/${id}`,
-        stats: `${API_URL}/requests/stats`  // ✅ NOUVEAU - Statistiques
-    },
+  // ==================
+  // COMMANDES
+  // ==================
+  orders: {
+    base: `${API_URL}/orders`,
+    byId: (id) => `${API_URL}/orders/${id}`,    // ✅ NOUVEAU
+    create: `${API_URL}/orders`,
+    update: (id) => `${API_URL}/orders/${id}`,
+    delete: (id) => `${API_URL}/orders/${id}`,
+    notifications: `${API_URL}/orders/notifications`
+    // ✅ Envoie automatiquement email au fournisseur
+    // ✅ Validation des stocks
+  },
 
-    // ========================================
-    // COMMANDES (routes améliorées)
-    // ========================================
-    orders: {
-        base: `${API_URL}/orders`,
-        byId: (id) => `${API_URL}/orders/${id}`,  // ✅ NOUVEAU
-        create: `${API_URL}/orders`,
-        update: (id) => `${API_URL}/orders/${id}`,
-        updateStatus: (id) => `${API_URL}/orders/${id}/status`,
-        delete: (id) => `${API_URL}/orders/${id}`,
-        notifications: `${API_URL}/orders/notifications`
-    }
+  // ==================
+  // REQUÊTES/DEMANDES
+  // ==================
+  requests: {
+    base: `${API_URL}/requests`,
+    byId: (id) => `${API_URL}/requests/${id}`,
+    create: `${API_URL}/requests`,
+    update: (id) => `${API_URL}/requests/${id}`,  // ✅ NOUVEAU
+    delete: (id) => `${API_URL}/requests/${id}`,
+    stats: `${API_URL}/requests/stats`            // ✅ NOUVEAU
+    // ✅ Gestion automatique du stock après approbation
+  }
 };
 
-/**
- * Configuration du timeout des requêtes (en millisecondes)
- */
-const REQUEST_TIMEOUT = 30000; // 30 secondes
+// ========================================
+// GESTION DE L'AUTHENTIFICATION
+// ========================================
 
 /**
- * Headers par défaut pour les requêtes
+ * Retourne les headers d'authentification
+ * @param {boolean} includeContentType - Inclure Content-Type (false pour FormData)
  */
-const DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-};
+export function getAuthHeaders(includeContentType = true) {
+  const token = localStorage.getItem('token');
+  const headers = {};
 
-/**
- * Fonction pour obtenir le token d'authentification
- * @returns {string|null} Le token JWT ou null si non connecté
- */
-function getAuthToken() {
-    return localStorage.getItem('token');
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  // ⚠️ IMPORTANT : Ne pas ajouter Content-Type pour FormData (upload fichiers)
+  if (includeContentType) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  return headers;
 }
 
 /**
- * Fonction pour obtenir les headers avec authentification
- * @param {Object} additionalHeaders - Headers additionnels à ajouter
- * @param {boolean} isFormData - Si true, ne pas inclure Content-Type (pour FormData)
- * @returns {Object} Headers complétés avec le token si disponible
+ * Vérifie si l'utilisateur est authentifié
  */
-function getAuthHeaders(additionalHeaders = {}, isFormData = false) {
-    const token = getAuthToken();
-    const headers = isFormData ? { ...additionalHeaders } : { ...DEFAULT_HEADERS, ...additionalHeaders };
+export function isAuthenticated() {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
 
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp * 1000;
+    return Date.now() < exp;
+  } catch {
+    return false;
+  }
 }
 
 /**
- * Fonction pour vérifier si l'utilisateur est connecté
- * @returns {boolean} True si connecté, false sinon
+ * Récupère le rôle de l'utilisateur
+ * @returns {string|null} "ADMIN" | "MAGASINIER" | "EMPLOYE" | null
  */
-function isAuthenticated() {
-    const token = getAuthToken();
-    if (!token) return false;
+export function getUserRole() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
 
-    try {
-        // Vérifier si le token n'est pas expiré
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const expiration = payload.exp * 1000; // Convertir en millisecondes
-        
-        if (Date.now() >= expiration) {
-            console.warn('⏰ Token expiré');
-            logout();
-            return false;
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('Erreur lors de la vérification du token:', error);
-        return false;
-    }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role;
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Fonction pour obtenir le rôle de l'utilisateur
- * @returns {string|null} Le rôle de l'utilisateur ou null
+ * Récupère l'ID de l'utilisateur
  */
-function getUserRole() {
-    const token = getAuthToken();
-    if (!token) return null;
+export function getUserId() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
 
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role;
-    } catch (error) {
-        console.error('Erreur lors de la récupération du rôle:', error);
-        return null;
-    }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id; // attention: dans le backend, le payload contient "id"
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Fonction pour obtenir l'ID de l'utilisateur
- * @returns {number|null} L'ID de l'utilisateur ou null
+ * Récupère le nom de l'utilisateur
  */
-function getUserId() {
-    const token = getAuthToken();
-    if (!token) return null;
+export function getUserName() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
 
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
-    } catch (error) {
-        console.error('Erreur lors de la récupération de l\'ID:', error);
-        return null;
-    }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.name;
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Fonction pour déconnecter l'utilisateur
+ * Déconnexion complète
  */
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    window.location.href = '/index.html';
+export function logout() {
+  // Nettoyer localStorage
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('userName');
+  
+  // Rediriger vers login
+  window.location.replace('/index.html');
 }
 
 /**
- * Fonction pour construire une URL avec des paramètres de requête
- * @param {string} baseUrl - URL de base
- * @param {Object} params - Paramètres de requête
- * @returns {string} URL complète avec paramètres
+ * Rafraîchit le token JWT
+ * @returns {Promise<string|null>} Nouveau token ou null
  */
-function buildUrlWithParams(baseUrl, params = {}) {
-    const url = new URL(baseUrl);
-    Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null) {
-            url.searchParams.append(key, params[key]);
-        }
+export async function refreshToken() {
+  try {
+    const response = await fetch(API_ENDPOINTS.auth.refresh, {
+      method: 'POST',
+      headers: getAuthHeaders()
     });
-    return url.toString();
+
+    if (!response.ok) {
+      console.warn('⚠️ Impossible de rafraîchir le token');
+      logout();
+      return null;
+    }
+
+    const data = await response.json();
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      console.log('✅ Token rafraîchi avec succès');
+      return data.token;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('❌ Erreur refresh token:', error);
+    logout();
+    return null;
+  }
 }
 
+// ========================================
+// FONCTION FETCH AMÉLIORÉE
+// ========================================
+
 /**
- * Fonction utilitaire pour faire des requêtes API avec gestion d'erreurs
- * @param {string} url - URL de la requête
+ * Fetch wrapper avec gestion automatique des erreurs
+ * @param {string} url - URL de l'endpoint
  * @param {Object} options - Options fetch
- * @returns {Promise<Object>} Réponse JSON
+ * @returns {Promise<any>} Données de la réponse
  */
-async function apiFetch(url, options = {}) {
-    try {
-        const response = await fetch(url, {
-            ...options,
-            headers: getAuthHeaders(options.headers || {})
-        });
+export async function apiFetch(url, options = {}) {
+  // Vérifier authentification (sauf pour login)
+  if (!isAuthenticated() && !url.includes('/auth/login')) {
+    console.warn('🔒 Session expirée');
+    logout();
+    throw new Error('SESSION_EXPIRED');
+  }
 
-        // Gérer les erreurs HTTP
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            
-            // ⚠️ NOUVEAU - Gérer les nouveaux codes d'erreur
-            if (response.status === 401) {
-                if (errorData.code === 'TOKEN_EXPIRED') {
-                    console.warn('⏰ Session expirée');
-                    logout();
-                    throw new Error('Session expirée. Veuillez vous reconnecter.');
-                }
-                if (errorData.code === 'TOKEN_INVALID') {
-                    console.error('❌ Token invalide');
-                    logout();
-                    throw new Error('Authentification invalide.');
-                }
-            }
+  // Préparer les options
+  const defaultOptions = {
+    headers: getAuthHeaders(
+      // Ne pas ajouter Content-Type si c'est du FormData
+      !(options.body instanceof FormData)
+    ),
+    ...options
+  };
 
-            if (response.status === 403) {
-                throw new Error(errorData.error || 'Accès refusé. Permissions insuffisantes.');
-            }
+  // Merger les headers si fournis
+  if (options.headers) {
+    defaultOptions.headers = {
+      ...defaultOptions.headers,
+      ...options.headers
+    };
+  }
 
-            throw new Error(errorData.error || `Erreur ${response.status}`);
+  try {
+    const response = await fetch(url, defaultOptions);
+
+    // ========================================
+    // GESTION DES CODES D'ERREUR
+    // ========================================
+
+    // 401 - Token expiré
+    if (response.status === 401) {
+      const errorData = await response.json().catch(() => ({}));
+
+      // TOKEN_EXPIRED - Tenter de rafraîchir
+      if (errorData.code === 'TOKEN_EXPIRED') {
+        console.warn('⏰ Token expiré, tentative de refresh...');
+        const newToken = await refreshToken();
+        
+        if (newToken) {
+          // Réessayer la requête avec le nouveau token
+          defaultOptions.headers.Authorization = `Bearer ${newToken}`;
+          const retryResponse = await fetch(url, defaultOptions);
+          
+          if (!retryResponse.ok) {
+            throw new Error(`HTTP ${retryResponse.status}`);
+          }
+          
+          return await retryResponse.json();
         }
+      }
 
-        return await response.json();
-
-    } catch (error) {
-        console.error('❌ Erreur API:', error);
-        throw error;
+      // TOKEN_INVALID ou échec refresh - Déconnexion
+      logout();
+      throw new Error('UNAUTHORIZED');
     }
+
+    // 403 - Permissions insuffisantes
+    if (response.status === 403) {
+      const errorData = await response.json().catch(() => ({}));
+      
+      if (errorData.code === 'INSUFFICIENT_ROLE') {
+        throw new Error('Vous n\'avez pas les permissions nécessaires');
+      }
+      
+      if (errorData.code === 'ADMIN_ONLY') {
+        throw new Error('Action réservée aux administrateurs');
+      }
+      
+      throw new Error('Accès refusé');
+    }
+
+    // 404 - Ressource non trouvée
+    if (response.status === 404) {
+      throw new Error('Ressource non trouvée');
+    }
+
+    // 409 - Conflit (ex: hiérarchie circulaire)
+    if (response.status === 409) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Conflit détecté');
+    }
+
+    // Autres erreurs
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+    }
+
+    // Succès - Retourner les données
+    return await response.json();
+
+  } catch (error) {
+    console.error('❌ Erreur API:', error.message);
+    throw error;
+  }
+}
+
+// ========================================
+// HELPERS POUR UPLOAD DE FICHIERS
+// ========================================
+
+/**
+ * Upload un fichier (image) avec FormData
+ * @param {string} url - URL de l'endpoint
+ * @param {FormData} formData - Données du formulaire avec fichier
+ * @returns {Promise<any>} Réponse du serveur
+ */
+export async function uploadFile(url, formData) {
+  if (!(formData instanceof FormData)) {
+    throw new Error('formData doit être une instance de FormData');
+  }
+
+  // ⚠️ IMPORTANT : Ne pas définir Content-Type pour FormData
+  // Le navigateur le fait automatiquement avec boundary
+  return await apiFetch(url, {
+    method: 'POST',
+    body: formData
+    // Pas de headers.Content-Type !
+  });
 }
 
 /**
- * Fonction pour rafraîchir le token
- * @returns {Promise<boolean>} True si succès, false sinon
+ * Met à jour un fichier (image)
+ * @param {string} url - URL de l'endpoint
+ * @param {FormData} formData - Données du formulaire avec fichier
+ * @returns {Promise<any>} Réponse du serveur
  */
-async function refreshToken() {
-    try {
-        const response = await fetch(API_ENDPOINTS.auth.refresh, {
-            method: 'POST',
-            headers: getAuthHeaders()
-        });
+export async function updateFile(url, formData) {
+  if (!(formData instanceof FormData)) {
+    throw new Error('formData doit être une instance de FormData');
+  }
 
-        if (!response.ok) {
-            throw new Error('Impossible de rafraîchir le token');
-        }
-
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        console.log('✅ Token rafraîchi avec succès');
-        return true;
-
-    } catch (error) {
-        console.error('❌ Erreur rafraîchissement token:', error);
-        logout();
-        return false;
-    }
+  return await apiFetch(url, {
+    method: 'PUT',
+    body: formData
+  });
 }
 
-// Export des constantes et fonctions
-export {
-    API_URL,
-    API_URL_IMG,
-    API_BASE_URL,
-    API_ENDPOINTS,
-    REQUEST_TIMEOUT,
-    DEFAULT_HEADERS,
-    getAuthToken,
-    getAuthHeaders,
-    isAuthenticated,
-    getUserRole,
-    getUserId,
-    logout,
-    buildUrlWithParams,
-    apiFetch,
-    refreshToken
-};
+// ========================================
+// HELPERS POUR CLOUDINARY
+// ========================================
 
-// Export par défaut (pour compatibilité)
+/**
+ * Vérifie si une URL d'image est une URL Cloudinary
+ * @param {string} imageUrl - URL de l'image
+ * @returns {boolean}
+ */
+export function isCloudinaryUrl(imageUrl) {
+  return imageUrl && imageUrl.includes('cloudinary.com');
+}
+
+/**
+ * Récupère l'URL complète d'une image
+ * (Gère à la fois les URLs Cloudinary et les URLs locales legacy)
+ * @param {string} imageUrl - URL de l'image depuis l'API
+ * @returns {string} URL complète
+ */
+export function getImageUrl(imageUrl) {
+  if (!imageUrl) return '/images/placeholder.png';
+  
+  // Si c'est déjà une URL Cloudinary, la retourner telle quelle
+  if (isCloudinaryUrl(imageUrl)) {
+    return imageUrl;
+  }
+  
+  // Sinon, c'est une URL locale (legacy)
+  return `${API_URLimg}${imageUrl}`;
+}
+
+// ========================================
+// VÉRIFICATION DES PERMISSIONS
+// ========================================
+
+/**
+ * Vérifie si l'utilisateur a le rôle requis
+ * @param {string|string[]} requiredRole - Rôle(s) requis
+ * @returns {boolean}
+ */
+export function hasRole(requiredRole) {
+  const userRole = getUserRole();
+  if (!userRole) return false;
+
+  if (Array.isArray(requiredRole)) {
+    return requiredRole.includes(userRole);
+  }
+
+  return userRole === requiredRole;
+}
+
+/**
+ * Vérifie si l'utilisateur est admin
+ * @returns {boolean}
+ */
+export function isAdmin() {
+  return getUserRole() === 'ADMIN';
+}
+
+/**
+ * Vérifie si l'utilisateur est magasinier ou admin
+ * @returns {boolean}
+ */
+export function isMagasinier() {
+  return hasRole(['ADMIN', 'MAGASINIER']);
+}
+
+/**
+ * Vérifie si l'utilisateur est employé
+ * @returns {boolean}
+ */
+export function isEmploye() {
+  return getUserRole() === 'EMPLOYE';
+}
+
+// Correction: il manquait une accolade fermante pour l'objet export default.
+// Nous devons exporter correctement.
 export default {
-    API_URL,
-    API_URLimg: API_URL_IMG,
-    API_BASE_URL,
-    ENDPOINTS: API_ENDPOINTS
+  // Config
+  API_URL,
+  API_URLimg,
+  API_ENDPOINTS,
+  
+  // Auth
+  getAuthHeaders,
+  isAuthenticated,
+  getUserRole,
+  getUserId,
+  getUserName,
+  logout,
+  refreshToken,
+  
+  // Fetch
+  apiFetch,
+  uploadFile,
+  updateFile,
+  
+  // Cloudinary
+  isCloudinaryUrl,
+  getImageUrl,
+  
+  // Permissions
+  hasRole,
+  isAdmin,
+  isMagasinier,
+  isEmploye
 };

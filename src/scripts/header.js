@@ -115,7 +115,7 @@ function initializeNotifications() {
               Commande #${notif.id} ${getStatusText(notif.status)}
             </div>
             <div class="notification-details">
-              <span class="notification-supplier">${notif.supplier.name}</span>
+              <span class="notification-supplier">${notif.supplier?.name || 'Inconnu'}</span>
               <span class="notification-time">${timeAgo}</span>
             </div>
           </div>

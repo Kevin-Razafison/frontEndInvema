@@ -1,10 +1,8 @@
-
-
-import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
+import { API_ENDPOINTS, apiFetch, isAuthenticated, getUserId } from './apiUrl.js';
 
 /**
  * Récupère la liste complète des requêtes/demandes
- * @param {Object} filters - Filtres optionnels (status, userId, etc.)
+ * @param {Object} filters - Filtres optionnels (status, userId, productId)
  * @returns {Promise<Array>} Liste des requêtes
  */
 export async function fetchRequests(filters = {}) {
@@ -16,42 +14,21 @@ export async function fetchRequests(filters = {}) {
     }
 
     try {
-        // Construire l'URL avec les filtres
-        let url = `${API_URL}/requests`;
-        const queryParams = new URLSearchParams();
+        let requests = await apiFetch(API_ENDPOINTS.requests.base);
 
+        // Filtres côté client
         if (filters.status) {
-            queryParams.append('status', filters.status);
+            requests = requests.filter(r => r.status === filters.status);
         }
         if (filters.userId) {
-            queryParams.append('userId', filters.userId);
+            requests = requests.filter(r => r.userId === Number(filters.userId));
         }
         if (filters.productId) {
-            queryParams.append('productId', filters.productId);
+            requests = requests.filter(r => r.productId === Number(filters.productId));
         }
 
-        if (queryParams.toString()) {
-            url += `?${queryParams.toString()}`;
-        }
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        // Gérer les erreurs HTTP
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.error('🔒 Session expirée');
-                redirectToLogin();
-                return [];
-            }
-            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(`✅ ${data.length} requête(s) récupérée(s)`);
-        return data;
+        console.log(`✅ ${requests.length} requête(s) récupérée(s)`);
+        return requests;
 
     } catch (error) {
         console.error('❌ Erreur lors de la récupération des requêtes:', error);
@@ -72,20 +49,7 @@ export async function fetchRequestById(requestId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/requests/${requestId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.warn(`⚠️ Requête #${requestId} non trouvée`);
-                return null;
-            }
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const request = await response.json();
+        const request = await apiFetch(API_ENDPOINTS.requests.byId(requestId));
         console.log(`✅ Requête #${requestId} récupérée`);
         return request;
 
@@ -126,25 +90,14 @@ export async function createRequest(requestData) {
 
         // Si userId n'est pas fourni, le récupérer du token
         if (!requestData.userId) {
-            const token = localStorage.getItem('token');
-            if (token) {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                requestData.userId = payload.id;
-            }
+            requestData.userId = getUserId();
         }
 
-        const response = await fetch(`${API_URL}/requests`, {
+        const newRequest = await apiFetch(API_ENDPOINTS.requests.create, {
             method: 'POST',
-            headers: getAuthHeaders(),
             body: JSON.stringify(requestData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
-        }
-
-        const newRequest = await response.json();
         console.log(`✅ Requête créée (ID: ${newRequest.id})`);
         showSuccessNotification('Demande créée avec succès');
         return newRequest;
@@ -157,7 +110,7 @@ export async function createRequest(requestData) {
 }
 
 /**
- * Met à jour une requête existante
+ * Met à jour une requête existante (quantité, raison)
  * @param {number|string} requestId - ID de la requête à modifier
  * @param {Object} updatedData - Nouvelles données de la requête
  * @returns {Promise<Object|null>} La requête mise à jour ou null en cas d'erreur
@@ -169,18 +122,11 @@ export async function updateRequest(requestId, updatedData) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/requests/${requestId}`, {
+        const updatedRequest = await apiFetch(API_ENDPOINTS.requests.update(requestId), {
             method: 'PUT',
-            headers: getAuthHeaders(),
             body: JSON.stringify(updatedData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
-        }
-
-        const updatedRequest = await response.json();
         console.log(`✅ Requête #${requestId} mise à jour`);
         showSuccessNotification('Demande mise à jour avec succès');
         return updatedRequest;
@@ -204,15 +150,9 @@ export async function deleteRequest(requestId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/requests/${requestId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
+        await apiFetch(API_ENDPOINTS.requests.delete(requestId), {
+            method: 'DELETE'
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
-        }
 
         console.log(`✅ Requête #${requestId} supprimée`);
         showSuccessNotification('Demande supprimée avec succès');
@@ -226,85 +166,63 @@ export async function deleteRequest(requestId) {
 }
 
 /**
- * Approuve une requête
- * @param {number|string} requestId - ID de la requête à approuver
- * @param {string} [comment] - Commentaire optionnel
- * @returns {Promise<Object|null>} La requête approuvée ou null en cas d'erreur
+ * Met à jour le statut d'une requête (APPROVED, REJECTED, etc.)
+ * @param {number|string} requestId - ID de la requête
+ * @param {string} status - Nouveau statut
+ * @returns {Promise<Object|null>} La requête mise à jour ou null
  */
-export async function approveRequest(requestId, comment = '') {
+export async function updateRequestStatus(requestId, status) {
     if (!isAuthenticated()) {
         redirectToLogin();
         return null;
     }
 
     try {
-        const response = await fetch(`${API_URL}/requests/${requestId}/approve`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ comment })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de l\'approbation');
+        const validStatuses = ["PENDING", "APPROVED", "REJECTER", "PREPARED", "PICKEDUP"];
+        if (!validStatuses.includes(status)) {
+            throw new Error(`Statut invalide. Valeurs acceptées: ${validStatuses.join(', ')}`);
         }
 
-        const approvedRequest = await response.json();
-        console.log(`✅ Requête #${requestId} approuvée`);
-        showSuccessNotification('Demande approuvée avec succès');
-        return approvedRequest;
+        const updated = await apiFetch(`${API_ENDPOINTS.requests.base}/${requestId}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ status })
+        });
+
+        console.log(`✅ Requête #${requestId} mise à jour: ${status}`);
+        showSuccessNotification(`Statut mis à jour: ${status}`);
+        return updated;
 
     } catch (error) {
-        console.error(`❌ Erreur lors de l'approbation de la requête #${requestId}:`, error);
+        console.error(`❌ Erreur lors de la mise à jour du statut #${requestId}:`, error);
         showErrorNotification(error.message);
         return null;
     }
 }
 
 /**
- * Rejette une requête
- * @param {number|string} requestId - ID de la requête à rejeter
- * @param {string} reason - Raison du rejet (obligatoire)
- * @returns {Promise<Object|null>} La requête rejetée ou null en cas d'erreur
+ * Récupère les statistiques des requêtes
+ * @returns {Promise<Object>} Statistiques
  */
-export async function rejectRequest(requestId, reason) {
+export async function getRequestStats() {
     if (!isAuthenticated()) {
         redirectToLogin();
-        return null;
-    }
-
-    if (!reason || reason.trim().length === 0) {
-        showErrorNotification('Vous devez fournir une raison pour le rejet');
-        return null;
+        return {};
     }
 
     try {
-        const response = await fetch(`${API_URL}/requests/${requestId}/reject`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ reason })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors du rejet');
-        }
-
-        const rejectedRequest = await response.json();
-        console.log(`✅ Requête #${requestId} rejetée`);
-        showSuccessNotification('Demande rejetée');
-        return rejectedRequest;
+        const stats = await apiFetch(API_ENDPOINTS.requests.stats);
+        console.log("📊 Statistiques des requêtes:", stats);
+        return stats;
 
     } catch (error) {
-        console.error(`❌ Erreur lors du rejet de la requête #${requestId}:`, error);
-        showErrorNotification(error.message);
-        return null;
+        console.error('❌ Erreur lors de la récupération des statistiques:', error);
+        return {};
     }
 }
 
 /**
  * Filtre les requêtes par statut
- * @param {string} status - Statut ('pending', 'approved', 'rejected')
+ * @param {string} status - Statut ('PENDING', 'APPROVED', etc.)
  * @returns {Promise<Array>} Liste des requêtes avec ce statut
  */
 export async function filterRequestsByStatus(status) {
@@ -334,44 +252,12 @@ export async function fetchRequestsByProduct(productId) {
  * @returns {Promise<Array>} Liste des requêtes de l'utilisateur
  */
 export async function fetchMyRequests() {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const userId = getUserId();
+    if (!userId) {
         redirectToLogin();
         return [];
     }
-
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const userId = payload.id;
-        return fetchRequestsByUser(userId);
-    } catch (error) {
-        console.error('❌ Erreur lors de la récupération des requêtes:', error);
-        return [];
-    }
-}
-
-/**
- * Compte les requêtes par statut
- * @returns {Promise<Object>} Objet avec les comptages {pending: x, approved: y, rejected: z}
- */
-export async function countRequestsByStatus() {
-    const allRequests = await fetchRequests();
-    
-    const counts = {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-        total: allRequests.length
-    };
-
-    allRequests.forEach(request => {
-        if (request.status in counts) {
-            counts[request.status]++;
-        }
-    });
-
-    console.log('📊 Comptage des requêtes:', counts);
-    return counts;
+    return fetchRequestsByUser(userId);
 }
 
 // ========================================
@@ -411,11 +297,10 @@ export default {
     createRequest,
     updateRequest,
     deleteRequest,
-    approveRequest,
-    rejectRequest,
+    updateRequestStatus,
+    getRequestStats,
     filterRequestsByStatus,
     fetchRequestsByUser,
     fetchRequestsByProduct,
-    fetchMyRequests,
-    countRequestsByStatus
+    fetchMyRequests
 };

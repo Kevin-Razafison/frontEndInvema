@@ -9,7 +9,7 @@
  * - Gestion du modal de requête
  */
 
-import { API_URL, isAuthenticated } from '../data/apiUrl.js';
+import { API_URL, isAuthenticated, getImageUrl, getUserRole } from '../data/apiUrl.js';
 import { fetchProducts } from '../data/product.js';
 import { createRequest } from '../data/request.js';
 
@@ -119,7 +119,7 @@ async function displayProducts() {
                             <option value="">Tous</option>
                             <option value="available">Disponible</option>
                             <option value="low">Stock faible</option>
-                            <option value="unavailable">Indisponible</option>
+                            <option value="out">Indisponible</option>
                         </select>
                     </label>
                 </div>
@@ -131,6 +131,9 @@ async function displayProducts() {
         `;
 
         mainContainer.innerHTML = html;
+
+        // Remplir les options de catégories
+        await populateCategoryFilter();
 
         // Initialiser les filtres
         initializeFilters();
@@ -145,6 +148,27 @@ async function displayProducts() {
 }
 
 /**
+ * Remplit le filtre de catégories
+ */
+async function populateCategoryFilter() {
+    try {
+        const { categorieList } = await import('../data/categoriesList.js');
+        const categories = await categorieList();
+        const select = document.getElementById('category-filter');
+        if (select) {
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+    } catch (err) {
+        console.error('Erreur chargement catégories:', err);
+    }
+}
+
+/**
  * Génère le HTML pour les cartes de produits
  * @param {Array} products - Liste des produits
  * @returns {string} HTML des cartes
@@ -152,7 +176,7 @@ async function displayProducts() {
 function renderProductCards(products) {
     return products.map(product => {
         const availability = getProductAvailability(product);
-        const imageUrl = product.img || product.imageUrl || './assets/images/placeholder.png';
+        const imageUrl = getImageUrl(product.imageUrl) || './src/images/placeholder.png';
 
         return `
             <div class="product-list-card" data-product-id="${product.id}">
@@ -161,7 +185,7 @@ function renderProductCards(products) {
                 </div>
                 
                 <div class="image-container">
-                    <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./assets/images/placeholder.png'">
+                    <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./src/images/placeholder.png'">
                     <div class="request-overlay">Demander</div>
                 </div>
                 
@@ -170,15 +194,15 @@ function renderProductCards(products) {
                     <div class="product-details">
                         <div class="detail-row">
                             <span class="label">Catégorie</span>
-                            <span class="value">${product.category || 'N/A'}</span>
+                            <span class="value">${product.category?.name || 'N/A'}</span>
                         </div>
                         <div class="detail-row price">
                             <span class="label">Prix</span>
-                            <span class="value">Ar ${formatPrice(product.prixUnitaire)}</span>
+                            <span class="value">Ar ${formatPrice(product.price)}</span>
                         </div>
                         <div class="detail-row quantity">
                             <span class="label">En stock</span>
-                            <span class="value">${product.quantite || 0}</span>
+                            <span class="value">${product.quantity || 0}</span>
                         </div>
                     </div>
                 </div>
@@ -193,8 +217,8 @@ function renderProductCards(products) {
  * @returns {Object} Informations de disponibilité
  */
 function getProductAvailability(product) {
-    const quantity = product.quantite || 0;
-    const threshold = product.seuilAlerte || 10;
+    const quantity = product.quantity || 0;
+    const threshold = product.alertLevel || 10;
 
     if (quantity === 0) {
         return { class: 'unavailable', label: 'Indisponible' };
@@ -244,7 +268,7 @@ async function openRequestModal(productId = null) {
                         <option value="">-- Sélectionner un produit --</option>
                         ${products.map(p => `
                             <option value="${p.id}" ${p.id === productId ? 'selected' : ''}>
-                                ${p.name} (Stock: ${p.quantite})
+                                ${p.name} (Stock: ${p.quantity})
                             </option>
                         `).join('')}
                     </select>
@@ -432,12 +456,17 @@ function filterProducts() {
 
     productCards.forEach(card => {
         const productName = card.querySelector('.product-name').textContent.toLowerCase();
-        const productCategory = card.querySelector('.detail-row .value').textContent;
-        const productAvailability = card.querySelector('.availability-badge').classList.value;
+        const productCategory = card.querySelector('.detail-row .value')?.textContent || '';
+        const productAvailabilityClass = card.querySelector('.availability-badge').className;
 
         const matchesSearch = productName.includes(searchTerm);
-        const matchesCategory = !category || productCategory === category;
-        const matchesAvailability = !availability || productAvailability.includes(availability);
+        const matchesCategory = !category || productCategory.includes(category) || productCategory === category;
+        let matchesAvailability = true;
+        if (availability) {
+            if (availability === 'available') matchesAvailability = productAvailabilityClass.includes('available');
+            else if (availability === 'low') matchesAvailability = productAvailabilityClass.includes('low');
+            else if (availability === 'out') matchesAvailability = productAvailabilityClass.includes('unavailable');
+        }
 
         if (matchesSearch && matchesCategory && matchesAvailability) {
             card.style.display = 'flex';

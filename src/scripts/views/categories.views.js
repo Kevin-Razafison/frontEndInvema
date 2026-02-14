@@ -12,7 +12,7 @@
 
 import { render, renderSection } from "../utils/render.js";
 import { form } from "../utils/renderForm.js";
-import { categorieList } from "../../data/categoriesList.js";
+import { categorieList, createCategory, updateCategory, deleteCategory } from "../../data/categoriesList.js";
 import { API_ENDPOINTS, apiFetch } from "../../data/apiUrl.js";
 import { interactiveNavBar } from "./NavBar.views.js";
 
@@ -252,6 +252,7 @@ async function showEditCategoryModal(categoryId) {
  */
 async function attachAddFormEvents(allCategories) {
     const formSection = document.querySelector('.form');
+    if (!formSection) return;
     const nameInput = formSection.querySelector('.category-name-input');
     const parentSelect = formSection.querySelector('.categorie-parent-select');
     const addBtn = formSection.querySelector('.add-category');
@@ -294,19 +295,15 @@ async function attachAddFormEvents(allCategories) {
             addBtn.disabled = true;
             addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
 
-            const newCategory = await apiFetch(API_ENDPOINTS.categories.create, {
-                method: "POST",
-                body: JSON.stringify({ 
-                    name,
-                    parentID
-                })
-            });
+            const newCategory = await createCategory({ name, parentID });
 
-            console.log("✅ Catégorie créée:", newCategory);
-            
-            formSection.remove();
-            await refreshCategories();
-            showSuccessToast("Catégorie créée avec succès");
+            if (newCategory) {
+                formSection.remove();
+                await refreshCategories();
+                showSuccessToast("Catégorie créée avec succès");
+            } else {
+                throw new Error("Échec de la création");
+            }
 
         } catch (error) {
             console.error("❌ Erreur création:", error);
@@ -324,6 +321,7 @@ async function attachAddFormEvents(allCategories) {
  */
 async function attachEditFormEvents(category, allCategories) {
     const formSection = document.querySelector('.form');
+    if (!formSection) return;
     const nameInput = formSection.querySelector('.category-name-input');
     const parentSelect = formSection.querySelector('.categorie-parent-select');
     const updateBtn = formSection.querySelector('.update-category');
@@ -366,19 +364,15 @@ async function attachEditFormEvents(category, allCategories) {
             updateBtn.disabled = true;
             updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
 
-            const updated = await apiFetch(API_ENDPOINTS.categories.update(category.id), {
-                method: "PUT",
-                body: JSON.stringify({ 
-                    name,
-                    parentID
-                })
-            });
+            const updated = await updateCategory(category.id, { name, parentID });
 
-            console.log("✅ Catégorie mise à jour:", updated);
-            
-            formSection.remove();
-            await refreshCategories();
-            showSuccessToast("Catégorie mise à jour avec succès");
+            if (updated) {
+                formSection.remove();
+                await refreshCategories();
+                showSuccessToast("Catégorie mise à jour avec succès");
+            } else {
+                throw new Error("Échec de la mise à jour");
+            }
 
         } catch (error) {
             console.error("❌ Erreur mise à jour:", error);
@@ -424,13 +418,11 @@ async function deleteCategoryWithConfirm(categoryId) {
 
         if (!confirmed) return;
 
-        await apiFetch(API_ENDPOINTS.categories.delete(categoryId), {
-            method: "DELETE"
-        });
-
-        console.log(`✅ Catégorie #${categoryId} supprimée`);
-        await refreshCategories();
-        showSuccessToast("Catégorie supprimée avec succès");
+        const success = await deleteCategory(categoryId);
+        if (success) {
+            await refreshCategories();
+            showSuccessToast("Catégorie supprimée avec succès");
+        }
 
     } catch (error) {
         console.error("❌ Erreur suppression:", error);

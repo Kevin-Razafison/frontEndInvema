@@ -8,7 +8,7 @@
  * - Création, modification, suppression de catégories
  */
 
-import { API_URL, getAuthHeaders, isAuthenticated } from './apiUrl.js';
+import { API_ENDPOINTS, apiFetch, isAuthenticated } from './apiUrl.js';
 
 /**
  * Récupère la liste complète des catégories
@@ -23,22 +23,7 @@ export async function categorieList() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/categories`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        // Gérer les erreurs HTTP
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.error('🔒 Session expirée');
-                redirectToLogin();
-                return [];
-            }
-            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
+        const data = await apiFetch(API_ENDPOINTS.categories.base);
         console.log(`✅ ${data.length} catégorie(s) récupérée(s)`);
         return data;
 
@@ -61,20 +46,7 @@ export async function fetchCategoryById(categoryId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/categories/${categoryId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.warn(`⚠️ Catégorie #${categoryId} non trouvée`);
-                return null;
-            }
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const category = await response.json();
+        const category = await apiFetch(API_ENDPOINTS.categories.byId(categoryId));
         console.log(`✅ Catégorie #${categoryId} récupérée:`, category.name);
         return category;
 
@@ -88,7 +60,7 @@ export async function fetchCategoryById(categoryId) {
  * Crée une nouvelle catégorie
  * @param {Object} categoryData - Données de la catégorie à créer
  * @param {string} categoryData.name - Nom de la catégorie
- * @param {string} [categoryData.description] - Description optionnelle
+ * @param {number|null} [categoryData.parentID] - ID de la catégorie parente
  * @returns {Promise<Object|null>} La catégorie créée ou null en cas d'erreur
  */
 export async function createCategory(categoryData) {
@@ -103,18 +75,11 @@ export async function createCategory(categoryData) {
             throw new Error('Le nom de la catégorie est obligatoire');
         }
 
-        const response = await fetch(`${API_URL}/categories`, {
+        const newCategory = await apiFetch(API_ENDPOINTS.categories.create, {
             method: 'POST',
-            headers: getAuthHeaders(),
             body: JSON.stringify(categoryData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
-        }
-
-        const newCategory = await response.json();
         console.log(`✅ Catégorie créée: ${newCategory.name} (ID: ${newCategory.id})`);
         showSuccessNotification(`Catégorie "${newCategory.name}" créée avec succès`);
         return newCategory;
@@ -139,18 +104,11 @@ export async function updateCategory(categoryId, updatedData) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/categories/${categoryId}`, {
+        const updatedCategory = await apiFetch(API_ENDPOINTS.categories.update(categoryId), {
             method: 'PUT',
-            headers: getAuthHeaders(),
             body: JSON.stringify(updatedData)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
-        }
-
-        const updatedCategory = await response.json();
         console.log(`✅ Catégorie #${categoryId} mise à jour`);
         showSuccessNotification('Catégorie mise à jour avec succès');
         return updatedCategory;
@@ -174,15 +132,9 @@ export async function deleteCategory(categoryId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/categories/${categoryId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
+        await apiFetch(API_ENDPOINTS.categories.delete(categoryId), {
+            method: 'DELETE'
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
-        }
 
         console.log(`✅ Catégorie #${categoryId} supprimée`);
         showSuccessNotification('Catégorie supprimée avec succès');
@@ -207,18 +159,9 @@ export async function fetchProductsByCategory(categoryId) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/products?category=${categoryId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const products = await response.json();
-        console.log(`✅ ${products.length} produit(s) trouvé(s) dans cette catégorie`);
-        return products;
+        // Note: l'API ne supporte pas directement le filtre par catégorie, on filtre côté client
+        const products = await apiFetch(API_ENDPOINTS.products.base);
+        return products.filter(p => p.categoryId === Number(categoryId) || p.category?.id === Number(categoryId));
 
     } catch (error) {
         console.error('❌ Erreur lors de la récupération des produits:', error);
@@ -239,17 +182,14 @@ export async function getProductCountByCategory() {
     try {
         const [categories, products] = await Promise.all([
             categorieList(),
-            fetch(`${API_URL}/products`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            }).then(res => res.json())
+            apiFetch(API_ENDPOINTS.products.base)
         ]);
 
         const counts = {};
         
         categories.forEach(category => {
             counts[category.id] = products.filter(
-                product => product.categoryId === category.id || product.category === category.id
+                product => product.categoryId === category.id || product.category?.id === category.id
             ).length;
         });
 
