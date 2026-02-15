@@ -4,6 +4,7 @@
 
 main .utilisateur-pannel-container {
     width: 100%;
+    max-width: 100%;
     min-height: calc(100vh - 120px);
     padding-bottom: 50px;
     padding-top: 100px; /* Espace pour la barre fixe */
