@@ -205,7 +205,7 @@ export function activateFournisseursButton() {
         card.addEventListener("click", async () => {
             const id = card.dataset.id;
             if (id) {
-                render(`#/fournisseurs/pannel`, parseInt(id));
+                await render(`#/fournisseurs/pannel`, parseInt(id));
             }
         });
     });

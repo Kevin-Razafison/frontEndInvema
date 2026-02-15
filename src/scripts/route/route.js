@@ -18,6 +18,6 @@ export const views = {
     "#/utilisateur": async () => `${await gestionUtilisateur()}`,
     "#/categories/productList": async () => `${await productList()}`,
     "#/productList": async () => `${await productList()}`,
-    "#/fournisseurs/pannel": async (id) => `${await renderFournisseur(id)}`,
+    "#/fournisseurs/pannel": renderFournisseur,
     "#/productList/Pannel": async (id) => `${await renderProduct(id)}`
 };
