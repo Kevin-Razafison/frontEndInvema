@@ -7,10 +7,14 @@ import { render, renderSection } from "./render.js";
 
 export async function renderProduct(productId) {
     const categorys = await categorieList();
-    const categoryOptionsHTML = categorys.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+    const categoryOptionsHTML = categorys.map(cat => 
+        `<option value="${cat.id}" ${cat.id === product.categoryId ? 'selected' : ''}>${cat.name}</option>`
+    ).join('');
 
     const suppliers = await fournisseursCards();
-    const suppliersOptionsHTML = suppliers.map(sup => `<option value="${sup.id}">${sup.name}</option>`).join('');
+    const suppliersOptionsHTML = suppliers.map(sup => 
+        `<option value="${sup.id}" ${sup.id === product.supplierId ? 'selected' : ''}>${sup.name}</option>`
+    ).join('');
 
     const products = await fetchProducts();
     const product = products.find(p => p.id === productId);
@@ -21,50 +25,115 @@ export async function renderProduct(productId) {
             <div class="previous arrow">
                 <img src="./src/icons/icons-arrow-left.png" alt="retour">
             </div>
-            <div>
-                <img src="${getImageUrl(product.imageUrl)}" alt="product-logo" class="product-image" onerror="this.src='./src/images/placeholder.png'">
+            
+            <div class="product-image-section">
+                <img src="${getImageUrl(product.imageUrl)}" alt="${product.name}" class="product-image" onerror="this.src='./src/images/placeholder.png'">
+                <input type="file" class="imageUrl" data-imgUrl="${product.imageUrl}" accept="image/*" style="display:none;">
             </div>
-            <div class="product-section">  
-                <div class="image-container">
-                    <input type="file" class="imageUrl" data-imgUrl="${product.imageUrl}" accept="image/*">
-                    <div class="button-container">
-                        <button class="Modifier">Modifier</button>
-                        <button class="Supprimer">Supprimer</button>
-                    </div>
-                </div>
+            
+            <div class="product-section">
                 <div class="information-product-container" data-product-id="${product.id}">
-                    <div class="product-name">
-                        Name : <span class="supplier-name">${product.name}</span> <input type="text" class="input-modifier-name" value="${product.name}" required>
+                    <h2>📦 Informations du produit</h2>
+                    
+                    <!-- Mode lecture -->
+                    <div class="view-mode">
+                        <div class="info-row">
+                            <span class="info-label">Nom :</span>
+                            <span class="info-value product-name-value">${product.name}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Description :</span>
+                            <span class="info-value product-description-value">${product.description || 'Aucune description'}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">SKU :</span>
+                            <span class="info-value product-sku-value">${product.sku || '-'}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Quantité :</span>
+                            <span class="info-value product-quantity-value">📦 ${product.quantity}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Prix :</span>
+                            <span class="info-value product-price-value" style="color: #27ae60; font-weight: 700;">Ar ${product.price}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Emplacement :</span>
+                            <span class="info-value product-location-value">${product.location || '-'}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Catégorie :</span>
+                            <span class="info-value product-category-value">${product.category?.name || '-'}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Fournisseur :</span>
+                            <span class="info-value product-supplier-value">${product.supplier?.name || '-'}</span>
+                        </div>
                     </div>
-                    <div class="product-description">
-                        Description : <span class="supplier-phone">${product.description || ''}</span> <input type="text" class="input-modifier-description" value="${product.description || ''}" required>
-                    </div>
-                    <div class="product-sku">
-                        SKU : <span class="supplier-email">${product.sku || ''}</span> <input type="text" class="input-modifier-sku" value="${product.sku || ''}" required>
-                    </div>
-                    <div class="product-quantity">
-                        Quantité : <span class="supplier-address">${product.quantity}</span> <input type="text" class="input-modifier-quantity" value="${product.quantity}" required>
-                    </div>
-                    <div class="product-price">
-                        Prix : <span class="supplier-category">${product.price}</span> <input type="text" class="input-modifier-price" value="${product.price}" required>
-                    </div>
-                    <div class="product-location">
-                        Location : <span class="supplier-count">${product.location || ''}</span> <input type="text" class="input-modifier-location" value="${product.location || ''}" required>
-                    </div>
-                    <div class="product-category">
-                        Catégorie : <span class="supplier-count">${product.category?.name || ''}</span> 
-                        <select style="display:none;">
-                            ${categoryOptionsHTML}
-                        </select>
-                    </div>
-                    <div class="product-supplier">
-                        Fournisseur : <span class="supplier-count">${product.supplier?.name || ''}</span>
-                        <select style="display:none;">
-                            ${suppliersOptionsHTML}
-                        </select>                        
+                    
+                    <!-- Mode édition (caché par défaut) -->
+                    <div class="edit-mode" style="display:none;">
+                        <div class="form-group">
+                            <label>Nom *</label>
+                            <input type="text" class="input-modifier-name" value="${product.name}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="input-modifier-description" rows="3">${product.description || ''}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>SKU</label>
+                            <input type="text" class="input-modifier-sku" value="${product.sku || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Quantité *</label>
+                            <input type="number" class="input-modifier-quantity" value="${product.quantity}" required min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Prix (Ar) *</label>
+                            <input type="number" class="input-modifier-price" value="${product.price}" required min="0" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Emplacement</label>
+                            <input type="text" class="input-modifier-location" value="${product.location || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Catégorie</label>
+                            <select class="input-modifier-category">
+                                <option value="">Aucune catégorie</option>
+                                ${categoryOptionsHTML}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fournisseur</label>
+                            <select class="input-modifier-supplier">
+                                <option value="">Aucun fournisseur</option>
+                                ${suppliersOptionsHTML}
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="terminer-modif" style="cursor:pointer; display:none">Confirmer Modification</div>
+                
+                <div class="button-container">
+                    <button class="Modifier">Modifier</button>
+                    <button class="Supprimer">Supprimer</button>
+                    <button class="terminer-modif" style="display:none;">Confirmer</button>
+                    <button class="annuler-modif" style="display:none;">Annuler</button>
+                </div>
             </div>
         </section>
     `;
@@ -87,32 +156,47 @@ export async function modifierProductButton() {
     if (!modifier) return;
 
     modifier.addEventListener("click", () => {
-        const informationContainer = document.querySelector(".information-product-container");
-        const productId = Number(informationContainer.dataset.productId);
-        const divList = informationContainer.querySelectorAll("div");
-        document.querySelector(".product-section .button-container").style.display = "none";
-        divList.forEach(div => {
-            const span = div.querySelector("span");
-            if (span) span.style.display = "none";
-            const input = div.querySelector("input");
-            if (input) input.style.display = "block";
-            const select = div.querySelector("select");
-            if (select) select.style.display = "block";
+        // Passer en mode édition
+        document.querySelector(".view-mode").style.display = "none";
+        document.querySelector(".edit-mode").style.display = "block";
+        document.querySelector(".product-image").style.display = "none";
+        document.querySelector(".imageUrl").style.display = "block";
+        
+        // Basculer les boutons
+        modifier.style.display = "none";
+        document.querySelector(".Supprimer").style.display = "none";
+        document.querySelector(".terminer-modif").style.display = "inline-flex";
+        document.querySelector(".annuler-modif").style.display = "inline-flex";
+        
+        // Gérer l'annulation
+        document.querySelector(".annuler-modif").addEventListener("click", () => {
+            document.querySelector(".view-mode").style.display = "block";
+            document.querySelector(".edit-mode").style.display = "none";
+            document.querySelector(".product-image").style.display = "block";
+            document.querySelector(".imageUrl").style.display = "none";
+            
+            modifier.style.display = "inline-flex";
+            document.querySelector(".Supprimer").style.display = "inline-flex";
+            document.querySelector(".terminer-modif").style.display = "none";
+            document.querySelector(".annuler-modif").style.display = "none";
         });
-        document.querySelector(".terminer-modif").style.display = "block";
+        
+        // Gérer la confirmation
         document.querySelector(".terminer-modif").addEventListener("click", async () => {
-            const data = [];
-            divList.forEach((div, index) => {
-                if (div.querySelector("input")) {
-                    data[index] = div.querySelector("input").value;
-                } else if (div.querySelector("select")) {
-                    data[index] = Number(div.querySelector("select").value);
-                }
-            });
+            const informationContainer = document.querySelector(".information-product-container");
+            const productId = Number(informationContainer.dataset.productId);
+            
+            const name = document.querySelector(".input-modifier-name").value.trim();
+            const description = document.querySelector(".input-modifier-description").value.trim();
+            const sku = document.querySelector(".input-modifier-sku").value.trim();
+            const quantity = Number(document.querySelector(".input-modifier-quantity").value);
+            const price = Number(document.querySelector(".input-modifier-price").value);
+            const location = document.querySelector(".input-modifier-location").value.trim();
+            const categoryId = Number(document.querySelector(".input-modifier-category").value) || null;
+            const supplierId = Number(document.querySelector(".input-modifier-supplier").value) || null;
 
-            const [name, description, sku, quantity, price, location, categoryId, supplierId] = data;
             if (!name || !quantity || !price) {
-                alert("Veuillez remplir les champs obligatoires");
+                alert("Veuillez remplir les champs obligatoires (nom, quantité, prix)");
                 return;
             }
 
@@ -120,9 +204,9 @@ export async function modifierProductButton() {
                 const formData = new FormData();
                 formData.append("name", name);
                 if (description) formData.append("description", description);
-                formData.append("quantity", Number(quantity));
+                formData.append("quantity", quantity);
                 if (sku) formData.append("sku", sku);
-                formData.append("price", Number(price));
+                formData.append("price", price);
                 if (location) formData.append("location", location);
                 if (categoryId) formData.append("categoryId", categoryId);
                 if (supplierId) formData.append("supplierId", supplierId);
@@ -134,13 +218,17 @@ export async function modifierProductButton() {
 
                 const updated = await updateProduct(productId, formData);
                 if (updated) {
-                    render("#/productList/Pannel", productId);
+                    // Recharger la page du produit
+                    await renderProduct(productId);
+                    previousProductButton();
+                    modifierProductButton();
+                    SupprimerProductButton();
                 } else {
                     throw new Error("Échec de la modification");
                 }
             } catch (err) {
                 console.error(err);
-                alert("Erreur lors de la modification");
+                alert("Erreur lors de la modification: " + err.message);
             }
         });
     });
@@ -149,21 +237,24 @@ export async function modifierProductButton() {
 export async function SupprimerProductButton() {
     const supprimer = document.querySelector(".Supprimer");
     if (!supprimer) return;
+    
     supprimer.addEventListener('click', async () => {
         const informationContainer = document.querySelector(".information-product-container");
         const productId = Number(informationContainer.dataset.productId);
+        
         if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
+        
         try {
             const success = await deleteProduct(productId);
             if (success) {
-                navigate("#/productList");
+                render("#/productList");
                 interactiveNavBar();
             } else {
                 throw new Error("Échec de la suppression");
             }
         } catch (err) {
             console.error(err);
-            alert("Erreur lors de la suppression");
+            alert("Erreur lors de la suppression: " + err.message);
         }
     });
 }
