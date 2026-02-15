@@ -359,29 +359,7 @@ export async function groupOrdersBySupplier() {
   return grouped;
 }
 
-/**
- * Affiche le panneau des commandes
- */
-export async function CommandePannel() {
-    const orders = await fetchOrders();
-    return renderSection("commandes-pannel", `
-        <div class="commandes-header">
-            <h2>Gestion des Commandes</h2>
-            <button class="btn-primary" id="create-order-btn">Nouvelle commande</button>
-        </div>
-        <div class="orders-list">
-            ${orders.map(order => `
-                <div class="order-card" data-order-id="${order.id}">
-                    <h3>Commande #${order.id}</h3>
-                    <p><strong>Fournisseur:</strong> ${order.supplier?.name || 'N/A'}</p>
-                    <p><strong>Statut:</strong> <span class="status-badge ${order.status.toLowerCase()}">${getStatusLabel(order.status)}</span></p>
-                    <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-                    <p><strong>Articles:</strong> ${order.items?.length || 0}</p>
-                </div>
-            `).join('')}
-        </div>
-    `);
-}
+
 
 // ========================================
 // FONCTIONS UTILITAIRES
@@ -431,6 +409,126 @@ function showErrorNotification(message) {
   // À implémenter avec votre système de notifications
 }
 
+export async function CommandePannel() {
+    const orders = await fetchOrders();
+
+    // Statistiques pour les onglets
+    const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+    const approvedCount = orders.filter(o => o.status === 'APPROVED').length;
+    const rejectedCount = orders.filter(o => o.status === 'REJECTER').length;
+    const preparedCount = orders.filter(o => o.status === 'PREPARED').length;
+    const pickedupCount = orders.filter(o => o.status === 'PICKEDUP').length;
+
+    // Générer les lignes du tableau
+    const rowsHTML = orders.map(order => `
+        <div class="row" data-order-id="${order.id}">
+            <div class="order-id row-content">
+                <span class="id">#${order.id}</span>
+            </div>
+            <div class="row-content">${order.supplier?.name || '-'}</div>
+            <div class="row-content">${new Date(order.createdAt).toLocaleDateString('fr-FR')}</div>
+            <div class="row-content">
+                <span class="status-badge ${order.status.toLowerCase()}">${getStatusLabel(order.status)}</span>
+            </div>
+            <div class="stock-count row-content">${order.items?.length || 0}</div>
+            <div class="row-content">
+                <button class="action-btn view-order" data-id="${order.id}">👁️</button>
+                <button class="action-btn edit-order" data-id="${order.id}">✏️</button>
+            </div>
+        </div>
+    `).join('');
+
+    return renderSection("order-management-container", `
+        <div class="order-management-title">Gestion des Commandes</div>
+        
+        <!-- Barre de filtres / onglets -->
+        <div class="categories-order">
+            <div class="categories-choice" id="order-status-tabs">
+                <div class="div-button active" data-status="ALL">Toutes</div>
+                <div class="div-button" data-status="PENDING">En attente (${pendingCount})</div>
+                <div class="div-button" data-status="APPROVED">Approuvées (${approvedCount})</div>
+                <div class="div-button" data-status="REJECTER">Rejetées (${rejectedCount})</div>
+                <div class="div-button" data-status="PREPARED">Préparées (${preparedCount})</div>
+                <div class="div-button" data-status="PICKEDUP">Récupérées (${pickedupCount})</div>
+                <div class="underline"></div>
+            </div>
+            <div class="historique-command-button" id="historique-btn">📆 Historique</div>
+        </div>
+
+        <!-- Tableau des commandes -->
+        <div class="part">
+            <div class="title-row">
+                <div>ID</div>
+                <div>Fournisseur</div>
+                <div>Date</div>
+                <div>Statut</div>
+                <div>Articles</div>
+                <div>Actions</div>
+            </div>
+            <div class="row-container">
+                ${rowsHTML || '<div class="no-data">Aucune commande trouvée</div>'}
+            </div>
+        </div>
+
+        <!-- Bouton pour nouvelle commande (flottant ou ailleurs) -->
+        <button class="btn-primary" id="create-order-btn" style="margin-top: 20px;">+ Nouvelle commande</button>
+    `);
+}
+
+export function attachOrderEvents() {
+    // Gestion des onglets
+    const tabs = document.querySelectorAll('.categories-choice .div-button');
+    const underline = document.querySelector('.underline');
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            // Retirer la classe active de tous les onglets
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Déplacer la barre sous l'onglet actif
+            const tabWidth = tab.offsetWidth;
+            const tabLeft = tab.offsetLeft;
+            underline.style.transform = `translateX(${tabLeft}px)`;
+            underline.style.width = `${tabWidth}px`;
+
+            // Filtrer les commandes par statut
+            const status = tab.dataset.status;
+            filterOrdersByStatusUI(status);
+        });
+    });
+
+    // Bouton nouvelle commande
+    document.getElementById('create-order-btn')?.addEventListener('click', () => {
+        // Implémenter l'ouverture d'un modal de création
+        console.log('Créer une commande');
+    });
+
+    // Boutons d'action sur chaque ligne
+    document.querySelectorAll('.view-order').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const orderId = e.target.dataset.id;
+            window.location.hash = `#/commande/${orderId}`; // à implémenter
+        });
+    });
+
+    // Historique
+    document.getElementById('historique-btn')?.addEventListener('click', () => {
+        console.log('Afficher historique');
+    });
+}
+
+// Fonction de filtrage (à compléter)
+function filterOrdersByStatusUI(status) {
+    const rows = document.querySelectorAll('.row');
+    rows.forEach(row => {
+        const orderStatus = row.querySelector('.status-badge').className.split(' ')[1]; // ex: "pending"
+        if (status === 'ALL' || orderStatus.toUpperCase() === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
 // Export par défaut
 export default {
   fetchOrders,

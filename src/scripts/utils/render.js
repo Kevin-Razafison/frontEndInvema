@@ -14,6 +14,7 @@ import { interactiveNavBar } from "../views/NavBar.views.js";
 import { activateProductListEvents } from "../views/productList.views.js";
 import { previousButton, modifierButton, SupprimerButton } from "./renderFournisseur.js";
 import { modifierProductButton, SupprimerProductButton, previousProductButton } from "./renderProducInfo.js";
+import { attachOrderEvents } from "../views/commandes.views.js";
 
 // État du routeur
 let currentRoute = '';
@@ -170,6 +171,7 @@ async function renderAdminRoute(route, id, view, main) {
 
         case "#/commandes":
             main.innerHTML = await view();
+            attachOrderEvents();
             break;
 
         case "#/fournisseurs":
