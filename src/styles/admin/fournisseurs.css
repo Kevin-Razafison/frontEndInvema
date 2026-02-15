@@ -1,97 +1,320 @@
-main .fournisseurs-container {
-    height: 80%;
-    overflow-x: auto;
-}
+/* ========================================
+   LISTE DES FOURNISSEURS - VERSION AMÉLIORÉE
+   ======================================== */
 
 main .fournisseurs-container {
-    font-size: 25px;
-    font-weight: bold;
-    color: #6C757D;
+    width: 100%;
+    min-height: 400px;
+    padding-bottom: 50px;
 }
 
-main .fournisseurs-title div {
-    margin-bottom: 12px;
-    font-size: 20px;
-    font-weight: bold;
+/* ========================================
+   HEADER
+   ======================================== */
+
+main .fournisseurs-title {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main .fournisseurs-title > div {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: -0.5px;
 }
 
 main .fournisseurs-title button {
-    padding: 12px;
-    margin-right: 12px;
+    padding: 12px 24px;
     border: none;
+    border-radius: 8px;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
+
+main .fournisseurs-title button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   GRILLE DE FOURNISSEURS
+   ======================================== */
+
+main .list-fournisseur {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 30px;
+}
+
+/* ========================================
+   CARTE AJOUTER FOURNISSEUR
+   ======================================== */
 
 main .list-fournisseur .add-fournisseur {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 200px;
-    height: 230px; 
-    background-color: white;
-    border-radius: 12px;
-    margin-top: 20px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    height: 280px;
+    background: white;
+    border: 3px dashed #3498db;
+    border-radius: 16px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 15px;
+}
+
+main .list-fournisseur .add-fournisseur:hover {
+    background: linear-gradient(135deg, #ecf0f1 0%, #ffffff 100%);
+    border-color: #2980b9;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(52, 152, 219, 0.2);
 }
 
 main .list-fournisseur .add-fournisseur:active {
-    opacity: 0.5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
 }
 
-main .fournisseurs-card img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
+main .list-fournisseur .add-fournisseur img {
+    width: 64px;
+    height: 64px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
 }
 
-main .fournisseurs-container .list-fournisseur {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 50px;
+main .list-fournisseur .add-fournisseur:hover img {
+    opacity: 1;
+    transform: scale(1.1);
 }
+
+main .list-fournisseur .add-fournisseur div {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3498db;
+}
+
+/* ========================================
+   CARTE FOURNISSEUR
+   ======================================== */
 
 main .fournisseurs-card {
-    display: grid;
-    grid-template-rows: 140px 1fr 1fr;
-    width: 200px;
-    height: 230px; 
-    background-color: white;
-    border-radius: 12px;
-    margin-top: 20px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+main .fournisseurs-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
 main .fournisseurs-card:active {
-    opacity: 0.7;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* Container d'image avec image centrée */
 main .fournisseurs-card .image-container {
+    width: 100%;
+    height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 140px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     overflow: hidden;
-    border-radius: 12px 12px 0 0;
+    position: relative;
 }
 
+main .fournisseurs-card .image-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+}
+
+main .fournisseurs-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+main .fournisseurs-card:hover img {
+    transform: scale(1.1);
+}
+
+/* Nom de l'entreprise */
 main .fournisseurs-card .entreprise-name {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 25px;
-    font-weight: bold;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: center;
+    flex: 1;
+    background: white;
 }
 
+/* Catégorie */
 main .fournisseurs-card .type-materiels-fourni {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 200px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7f8c8d;
+    background: #f8f9fa;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* Badge de compteur de produits (optionnel) */
+main .fournisseurs-card .product-count {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* ========================================
+   ÉTATS ET ANIMATIONS
+   ======================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+main .fournisseurs-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+main .fournisseurs-card:nth-child(1) { animation-delay: 0.05s; }
+main .fournisseurs-card:nth-child(2) { animation-delay: 0.1s; }
+main .fournisseurs-card:nth-child(3) { animation-delay: 0.15s; }
+main .fournisseurs-card:nth-child(4) { animation-delay: 0.2s; }
+main .fournisseurs-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* État de chargement */
+.fournisseurs-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+.fournisseurs-loading::before {
+    content: '';
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ecf0f1;
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* État vide */
+.fournisseurs-empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    color: #95a5a6;
+}
+
+.fournisseurs-empty::before {
+    content: '📦';
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.fournisseurs-empty::after {
+    content: 'Aucun fournisseur pour le moment';
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1200px) {
+    main .list-fournisseur {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    main .fournisseurs-title {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    main .fournisseurs-title > div {
+        font-size: 24px;
+    }
+
+    main .list-fournisseur {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    main .fournisseurs-card {
+        height: 260px;
+    }
+}
+
+@media (max-width: 500px) {
+    main .list-fournisseur {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    main .fournisseurs-card {
+        height: 240px;
+    }
 }
