@@ -6,6 +6,13 @@ import { interactiveNavBar } from "../views/NavBar.views.js";
 import { render, renderSection } from "./render.js";
 
 export async function renderProduct(productId) {
+    const products = await fetchProducts();
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+        return renderSection("product-Pannel", "<p>Produit non trouvé</p>");
+    }
+
     const categorys = await categorieList();
     const categoryOptionsHTML = categorys.map(cat => 
         `<option value="${cat.id}" ${cat.id === product.categoryId ? 'selected' : ''}>${cat.name}</option>`
@@ -15,10 +22,6 @@ export async function renderProduct(productId) {
     const suppliersOptionsHTML = suppliers.map(sup => 
         `<option value="${sup.id}" ${sup.id === product.supplierId ? 'selected' : ''}>${sup.name}</option>`
     ).join('');
-
-    const products = await fetchProducts();
-    const product = products.find(p => p.id === productId);
-    if (!product) return renderSection("product-Pannel", "<p>Produit non trouvé</p>");
 
     const productAboutHTML = `
         <section class="product-pannel">
@@ -125,14 +128,21 @@ export async function renderProduct(productId) {
                                 ${suppliersOptionsHTML}
                             </select>
                         </div>
+                        
+                        <div class="form-group">
+                            <label>📷 Changer l'image</label>
+                            <div class="image-upload-zone" onclick="document.querySelector('.imageUrl').click()">
+                                <span>Cliquer pour sélectionner une image</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="button-container">
-                    <button class="Modifier">Modifier</button>
-                    <button class="Supprimer">Supprimer</button>
-                    <button class="terminer-modif" style="display:none;">Confirmer</button>
-                    <button class="annuler-modif" style="display:none;">Annuler</button>
+                    <button class="Modifier">✏️ Modifier</button>
+                    <button class="Supprimer">🗑️ Supprimer</button>
+                    <button class="terminer-modif" style="display:none;">✓ Confirmer</button>
+                    <button class="annuler-modif" style="display:none;">✖ Annuler</button>
                 </div>
             </div>
         </section>
@@ -159,8 +169,6 @@ export async function modifierProductButton() {
         // Passer en mode édition
         document.querySelector(".view-mode").style.display = "none";
         document.querySelector(".edit-mode").style.display = "block";
-        document.querySelector(".product-image").style.display = "none";
-        document.querySelector(".imageUrl").style.display = "block";
         
         // Basculer les boutons
         modifier.style.display = "none";
@@ -169,20 +177,20 @@ export async function modifierProductButton() {
         document.querySelector(".annuler-modif").style.display = "inline-flex";
         
         // Gérer l'annulation
-        document.querySelector(".annuler-modif").addEventListener("click", () => {
+        const annulerBtn = document.querySelector(".annuler-modif");
+        annulerBtn.addEventListener("click", () => {
             document.querySelector(".view-mode").style.display = "block";
             document.querySelector(".edit-mode").style.display = "none";
-            document.querySelector(".product-image").style.display = "block";
-            document.querySelector(".imageUrl").style.display = "none";
             
             modifier.style.display = "inline-flex";
             document.querySelector(".Supprimer").style.display = "inline-flex";
             document.querySelector(".terminer-modif").style.display = "none";
-            document.querySelector(".annuler-modif").style.display = "none";
+            annulerBtn.style.display = "none";
         });
         
         // Gérer la confirmation
-        document.querySelector(".terminer-modif").addEventListener("click", async () => {
+        const terminerBtn = document.querySelector(".terminer-modif");
+        terminerBtn.addEventListener("click", async () => {
             const informationContainer = document.querySelector(".information-product-container");
             const productId = Number(informationContainer.dataset.productId);
             
@@ -219,10 +227,8 @@ export async function modifierProductButton() {
                 const updated = await updateProduct(productId, formData);
                 if (updated) {
                     // Recharger la page du produit
-                    await renderProduct(productId);
-                    previousProductButton();
-                    modifierProductButton();
-                    SupprimerProductButton();
+                    window.location.hash = `#/product/${productId}`;
+                    window.location.reload();
                 } else {
                     throw new Error("Échec de la modification");
                 }
@@ -247,8 +253,7 @@ export async function SupprimerProductButton() {
         try {
             const success = await deleteProduct(productId);
             if (success) {
-                render("#/productList");
-                interactiveNavBar();
+                window.location.hash = "#/productList";
             } else {
                 throw new Error("Échec de la suppression");
             }
