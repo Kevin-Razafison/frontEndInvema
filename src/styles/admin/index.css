@@ -28,7 +28,7 @@ main .utilisateur-pannel-container .ajouter-utilisateurs {
     position: fixed;
     top: 60px;
     right: 0;
-    left: 250px;
+    left: 50px;
     z-index: 100;
     background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
     padding: 20px 30px;
