@@ -14,10 +14,10 @@ export const views = {
     "#/categories": async () => `${await categories()}`,
     "#/commandes": async () => `${await CommandePannel()}`,
     "#/dashboard": async () => `${await DashBoard()}`,
-    "#/fournisseurs": () => `${fournisseurs()}`,
+    "#/fournisseurs": async () => `${await fournisseurs()}`,
     "#/utilisateur": async () => `${await gestionUtilisateur()}`,
     "#/categories/productList": async () => `${await productList()}`,
     "#/productList": async () => `${await productList()}`,
-    "#/fournisseurs/pannel": renderFournisseur,
+    "#/fournisseurs/pannel": async (id) => `${await renderFournisseur(id)}`,
     "#/productList/Pannel": async (id) => `${await renderProduct(id)}`
 };
