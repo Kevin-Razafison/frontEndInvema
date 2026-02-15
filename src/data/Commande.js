@@ -2,7 +2,7 @@
 
 
 // Fonction pour fetch les commandes depuis ton backend
-import { API_URL } from "./apiUrl";
+import { API_URL } from "./apiUrl.js";
 export async function fetchOrders() {
     const token = localStorage.getItem("token");
 if (!token) {

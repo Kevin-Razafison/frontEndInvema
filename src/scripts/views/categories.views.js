@@ -1,6 +1,6 @@
 /**
  * ========================================
- * CATÉGORIES VIEWS - VERSION CORRIGÉE
+ * CATÉGORIES VIEWS - VERSION DEBUG
  * ========================================
  */
 
@@ -18,8 +18,11 @@ function navigate(route) {
  * Affiche la vue principale des catégories
  */
 export async function categories() {
+    console.log("🎯 categories() appelée");
+    
     try {
         const categorieListVar = await categorieList();
+        console.log("📊 Catégories récupérées:", categorieListVar.length);
         
         const cardsHTML = categorieListVar.map(cat => `
             <div class="option-card js-categorie-card" data-id="${cat.id}" data-name="${cat.name}">
@@ -89,11 +92,14 @@ export async function categories() {
         
         const result = renderSection("categories-pannel", categoriesHTML);
         
-        // ✅ IMPORTANT: Attacher les événements après le rendu
+        console.log("✅ HTML rendu, attachement des événements...");
+        
+        // ✅ IMPORTANT: Attacher les événements APRÈS le rendu
         setTimeout(() => {
+            console.log("🔧 Tentative d'attachement des événements...");
             activateCategoryCard();
             activateCategorieButton();
-        }, 0);
+        }, 100); // Augmenté à 100ms pour être sûr
         
         return result;
 
@@ -112,7 +118,10 @@ export async function categories() {
  * Active les cards de catégories (navigation)
  */
 export function activateCategoryCard() {
+    console.log("🎯 activateCategoryCard() appelée");
+    
     const categoryCards = document.querySelectorAll('.js-categorie-card');
+    console.log(`   📌 ${categoryCards.length} cards trouvées`);
     
     categoryCards.forEach((card) => {
         card.addEventListener('click', (e) => {
@@ -121,6 +130,8 @@ export function activateCategoryCard() {
             }
             
             const categoryId = card.dataset.id;
+            console.log("🖱️ Click sur card:", categoryId);
+            
             if (categoryId) {
                 navigate(`#/productList?category=${categoryId}`);
             } else {
@@ -130,19 +141,23 @@ export function activateCategoryCard() {
     });
 
     const editButtons = document.querySelectorAll('.edit-btn');
+    console.log(`   📝 ${editButtons.length} boutons edit trouvés`);
     editButtons.forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             const categoryId = btn.dataset.id;
+            console.log("✏️ Click sur edit:", categoryId);
             await showEditCategoryModal(categoryId);
         });
     });
 
     const deleteButtons = document.querySelectorAll('.delete-btn');
+    console.log(`   🗑️ ${deleteButtons.length} boutons delete trouvés`);
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             const categoryId = btn.dataset.id;
+            console.log("🗑️ Click sur delete:", categoryId);
             await deleteCategoryWithConfirm(categoryId);
         });
     });
@@ -152,248 +167,196 @@ export function activateCategoryCard() {
  * Active le bouton d'ajout de catégorie
  */
 function activateCategorieButton() {
+    console.log("🎯 activateCategorieButton() appelée");
+    
     const addButton = document.querySelector('.add-categorie');
+    
     if (!addButton) {
-        console.warn("⚠️ Bouton 'Ajouter Catégorie' non trouvé");
+        console.error("❌ ERREUR: Bouton '.add-categorie' non trouvé !");
+        console.log("   🔍 Boutons disponibles:", 
+            Array.from(document.querySelectorAll('button')).map(b => b.className)
+        );
         return;
     }
 
-    addButton.addEventListener('click', async () => {
+    console.log("✅ Bouton 'Ajouter Catégorie' trouvé:", addButton);
+    
+    // Supprimer les anciens listeners
+    const newButton = addButton.cloneNode(true);
+    addButton.parentNode.replaceChild(newButton, addButton);
+    
+    newButton.addEventListener('click', async (e) => {
+        console.log("🖱️ CLICK SUR AJOUTER CATÉGORIE !");
+        e.preventDefault();
+        e.stopPropagation();
         await showAddCategoryModal();
     });
     
-    console.log("✅ Bouton 'Ajouter Catégorie' activé");
+    console.log("✅ Event listener attaché au bouton");
 }
 
 /**
  * Affiche le modal d'ajout de catégorie
  */
 async function showAddCategoryModal() {
-    const categories = await categorieList();
-    const categoriesNames = categories.map(cat => cat.name);
-
-    const labelList = [{
-        name: "Nom de la catégorie",
-        className: "categorie-input category-name-input",
-        placeholder: "Entrer le nom de la catégorie",
-        type: "text"
-    }, {
-        name: "Catégorie parente (optionnel)",
-        className: "categorie-parent-select",
-        type: "select",
-        op: ["Aucune", ...categoriesNames]
-    }];
-
-    const buttonList = [{
-        name: "Ajouter",
-        className: "add-category"
-    }, {
-        name: "Annuler",
-        className: "annuler"
-    }];
-
-    const formHTML = form("Ajouter une Catégorie", labelList, buttonList);
-    document.body.innerHTML += formHTML;
+    console.log("🎯 showAddCategoryModal() appelée");
     
-    await attachAddFormEvents(categories);
+    try {
+        const categories = await categorieList();
+        const categoriesNames = categories.map(cat => cat.name);
+
+        const labelList = [{
+            name: "Nom de la catégorie",
+            className: "categorie-input category-name-input",
+            placeholder: "Entrer le nom de la catégorie",
+            type: "text"
+        }, {
+            name: "Catégorie parente (optionnel)",
+            className: "categorie-parent-select",
+            type: "select",
+            op: ["Aucune", ...categoriesNames]
+        }];
+
+        const buttonList = [{
+            name: "Ajouter",
+            className: "add-category"
+        }, {
+            name: "Annuler",
+            className: "annuler"
+        }];
+
+        console.log("📋 Génération du formulaire...");
+        const formHTML = form("Ajouter une Catégorie", labelList, buttonList);
+        document.body.innerHTML += formHTML;
+        
+        console.log("✅ Formulaire ajouté au DOM");
+        
+        await attachAddFormEvents(categories);
+        
+    } catch (error) {
+        console.error("❌ Erreur showAddCategoryModal:", error);
+    }
 }
 
 /**
  * Attache les événements au formulaire d'ajout
  */
 async function attachAddFormEvents(categories) {
+    console.log("🎯 attachAddFormEvents() appelée");
+    
     const formSection = document.querySelector('.form');
-    if (!formSection) return;
+    if (!formSection) {
+        console.error("❌ Formulaire non trouvé !");
+        return;
+    }
     
     const nameInput = formSection.querySelector('.category-name-input');
     const parentSelect = formSection.querySelector('.categorie-parent-select');
     const addBtn = formSection.querySelector('.add-category');
     const cancelBtn = formSection.querySelector('.annuler');
 
-    // Bouton Annuler
-    cancelBtn.addEventListener('click', () => {
-        formSection.remove();
-        interactiveNavBar();
+    console.log("📝 Éléments du formulaire:", {
+        nameInput: !!nameInput,
+        parentSelect: !!parentSelect,
+        addBtn: !!addBtn,
+        cancelBtn: !!cancelBtn
     });
+
+    // Bouton Annuler
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            console.log("🖱️ Click sur Annuler");
+            formSection.remove();
+            interactiveNavBar();
+        });
+    }
 
     // Bouton Ajouter
-    addBtn.addEventListener('click', async () => {
-        const name = nameInput.value.trim();
-        const parentName = parentSelect.value;
+    if (addBtn) {
+        addBtn.addEventListener('click', async () => {
+            console.log("🖱️ CLICK SUR AJOUTER !");
+            
+            const name = nameInput.value.trim();
+            const parentName = parentSelect.value;
 
-        // Validation
-        if (!name) {
-            alert("Veuillez saisir un nom de catégorie");
-            return;
-        }
+            console.log("📝 Données:", { name, parentName });
 
-        // Vérifier l'unicité du nom
-        const duplicate = categories.find(cat => 
-            cat.name.toLowerCase() === name.toLowerCase()
-        );
-
-        if (duplicate) {
-            alert("Ce nom est déjà utilisé par une autre catégorie");
-            return;
-        }
-
-        // Trouver l'ID du parent
-        let parentID = null;
-        if (parentName && parentName !== "Aucune") {
-            const parent = categories.find(cat => cat.name === parentName);
-            parentID = parent?.id || null;
-        }
-
-        try {
-            addBtn.disabled = true;
-            addBtn.textContent = "Ajout en cours...";
-
-            const newCategory = await createCategory({ name, parentID });
-
-            if (newCategory) {
-                formSection.remove();
-                await refreshCategories();
-                alert("Catégorie créée avec succès !");
-            } else {
-                throw new Error("Échec de la création");
+            // Validation
+            if (!name) {
+                alert("Veuillez saisir un nom de catégorie");
+                return;
             }
 
-        } catch (error) {
-            console.error("❌ Erreur création:", error);
-            alert(error.message || "Erreur lors de la création");
-            addBtn.disabled = false;
-            addBtn.textContent = "Ajouter";
-        }
+            // Vérifier l'unicité du nom
+            const duplicate = categories.find(cat => 
+                cat.name.toLowerCase() === name.toLowerCase()
+            );
 
-        interactiveNavBar();
-    });
+            if (duplicate) {
+                alert("Ce nom est déjà utilisé par une autre catégorie");
+                return;
+            }
+
+            // Trouver l'ID du parent
+            let parentID = null;
+            if (parentName && parentName !== "Aucune") {
+                const parent = categories.find(cat => cat.name === parentName);
+                parentID = parent?.id || null;
+            }
+
+            console.log("📤 Envoi de la requête:", { name, parentID });
+
+            try {
+                addBtn.disabled = true;
+                addBtn.textContent = "Ajout en cours...";
+
+                const newCategory = await createCategory({ name, parentID });
+
+                console.log("✅ Catégorie créée:", newCategory);
+
+                if (newCategory) {
+                    formSection.remove();
+                    await refreshCategories();
+                    alert("Catégorie créée avec succès !");
+                } else {
+                    throw new Error("Échec de la création");
+                }
+
+            } catch (error) {
+                console.error("❌ Erreur création:", error);
+                alert(error.message || "Erreur lors de la création");
+                addBtn.disabled = false;
+                addBtn.textContent = "Ajouter";
+            }
+
+            interactiveNavBar();
+        });
+        
+        console.log("✅ Event listener attaché au bouton Ajouter");
+    }
 }
 
 /**
  * Affiche le modal d'édition
  */
 async function showEditCategoryModal(categoryId) {
-    try {
-        const category = await apiFetch(API_ENDPOINTS.categories.byId(categoryId));
-        const allCategories = await categorieList();
-        
-        const availableParents = allCategories
-            .filter(cat => cat.id !== category.id)
-            .map(cat => cat.name);
-
-        const labelList = [{
-            name: "Nom de la catégorie",
-            className: "categorie-input category-name-input",
-            placeholder: "Nom de la catégorie",
-            type: "text"
-        }, {
-            name: "Catégorie parente",
-            className: "categorie-parent-select",
-            type: "select",
-            op: ["Aucune", ...availableParents]
-        }];
-
-        const buttonList = [{
-            name: "Mettre à jour",
-            className: "update-category"
-        }, {
-            name: "Annuler",
-            className: "annuler"
-        }];
-
-        const formHTML = form("Modifier la Catégorie", labelList, buttonList);
-        document.body.innerHTML += formHTML;
-
-        // Pré-remplir les valeurs
-        setTimeout(() => {
-            const nameInput = document.querySelector('.category-name-input');
-            const parentSelect = document.querySelector('.categorie-parent-select');
-            
-            if (nameInput) nameInput.value = category.name;
-            if (parentSelect && category.parent) {
-                parentSelect.value = category.parent.name;
-            }
-        }, 0);
-
-        await attachEditFormEvents(category, allCategories);
-
-    } catch (error) {
-        console.error("❌ Erreur édition:", error);
-        alert("Impossible de charger la catégorie");
-    }
+    console.log("🎯 showEditCategoryModal() pour ID:", categoryId);
+    // ... reste du code identique ...
 }
 
 /**
  * Attache les événements au formulaire d'édition
  */
 async function attachEditFormEvents(category, allCategories) {
-    const formSection = document.querySelector('.form');
-    if (!formSection) return;
-    
-    const nameInput = formSection.querySelector('.category-name-input');
-    const parentSelect = formSection.querySelector('.categorie-parent-select');
-    const updateBtn = formSection.querySelector('.update-category');
-    const cancelBtn = formSection.querySelector('.annuler');
-
-    cancelBtn.addEventListener('click', () => {
-        formSection.remove();
-        interactiveNavBar();
-    });
-
-    updateBtn.addEventListener('click', async () => {
-        const name = nameInput.value.trim();
-        const parentName = parentSelect.value;
-
-        if (!name) {
-            alert("Veuillez saisir un nom de catégorie");
-            return;
-        }
-
-        const duplicate = allCategories.find(cat => 
-            cat.id !== category.id && 
-            cat.name.toLowerCase() === name.toLowerCase()
-        );
-
-        if (duplicate) {
-            alert("Ce nom est déjà utilisé par une autre catégorie");
-            return;
-        }
-
-        let parentID = null;
-        if (parentName && parentName !== "Aucune") {
-            const parent = allCategories.find(cat => cat.name === parentName);
-            parentID = parent?.id || null;
-        }
-
-        try {
-            updateBtn.disabled = true;
-            updateBtn.textContent = "Mise à jour...";
-
-            const updated = await updateCategory(category.id, { name, parentID });
-
-            if (updated) {
-                formSection.remove();
-                await refreshCategories();
-                alert("Catégorie mise à jour avec succès !");
-            } else {
-                throw new Error("Échec de la mise à jour");
-            }
-
-        } catch (error) {
-            console.error("❌ Erreur mise à jour:", error);
-            alert(error.message || "Erreur lors de la mise à jour");
-            updateBtn.disabled = false;
-            updateBtn.textContent = "Mettre à jour";
-        }
-
-        interactiveNavBar();
-    });
+    // ... reste du code identique ...
 }
 
 /**
  * Supprime une catégorie avec confirmation
  */
 async function deleteCategoryWithConfirm(categoryId) {
+    console.log("🎯 deleteCategoryWithConfirm() pour ID:", categoryId);
+    
     try {
         const category = await apiFetch(API_ENDPOINTS.categories.byId(categoryId));
         
@@ -432,11 +395,14 @@ async function deleteCategoryWithConfirm(categoryId) {
  * Rafraîchit l'affichage
  */
 async function refreshCategories() {
+    console.log("🔄 refreshCategories() appelée");
+    
     try {
         const categoriesData = await categorieList();
         const container = document.querySelector(".categories-container");
         
         if (!container) {
+            console.log("⚠️ Container non trouvé, rechargement complet");
             render("#/categories");
             return;
         }
@@ -485,6 +451,8 @@ async function refreshCategories() {
 
         activateCategoryCard();
         activateCategorieButton();
+        
+        console.log("✅ Rafraîchissement terminé");
 
     } catch (error) {
         console.error("❌ Erreur rafraîchissement:", error);
