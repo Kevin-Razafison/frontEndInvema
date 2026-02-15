@@ -1,389 +1,50 @@
 /* ========================================
-   PANNEAU DE GESTION DES UTILISATEURS
+   STYLES GLOBAUX - INDEX.CSS
    ======================================== */
 
-main .utilisateur-pannel-container {
-    min-height: calc(100vh - 120px);
-    padding-bottom: 50px;
-    padding-top: 100px; /* Espace pour la barre fixe */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    transition: all ease-in-out 0.15s;
 }
 
-/* ========================================
-   TITRE DU PANNEAU
-   ======================================== */
-
-main .utilisateur-pannel-container .pannel-title {
-    font-size: 32px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 25px;
-    letter-spacing: -0.5px;
-}
-
-/* ========================================
-   BARRE D'ACTIONS (Ajouter utilisateur + Filtres)
-   ======================================== */
-
-main .utilisateur-pannel-container .ajouter-utilisateurs {
-    position: fixed;
-    top: 60px;
-    right: 0;
-    left: 50px;
-    z-index: 100;
-    background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
-    padding: 20px 30px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Le premier bouton "Ajouter utilisateur" */
-main .utilisateur-pannel-container .ajouter-utilisateurs > button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
+button {
     cursor: pointer;
-    background-color: #27ae60;
-    color: white;
-    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs > button:hover {
-    background-color: #229954;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+body {
+    background-color: #d9dbdd;
+    height: 100%;
+    width: 100%;
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs > button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
-}
-
-main .utilisateur-pannel-container .ajouter-utilisateurs > button::before {
-    content: '+';
-    font-size: 20px;
-    font-weight: bold;
-}
-
-/* ========================================
-   FILTRES (à l'intérieur de la barre fixe)
-   ======================================== */
-
-main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container {
-    display: flex;
-    gap: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 8px;
-    border-radius: 10px;
-}
-
-main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter {
-    padding: 10px 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.8);
-    transition: all 0.2s ease;
-}
-
-main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-color: #3498db;
-    color: white;
-}
-
-main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .is-filter-active {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
-}
-
-/* ========================================
-   CONTAINER DE LA LISTE
-   ======================================== */
-
-main .utilisateur-pannel-container .list-users-containers {
-    max-width: 1400px;
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-/* En-tête de la liste - CORRIGÉ: 4 colonnes alignées avec le JS */
-main .utilisateur-pannel-container .list-users-containers .list-users-title {
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
-    gap: 20px;
-    padding: 20px 30px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
-    border-bottom: 2px solid #e0e0e0;
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #5a6c7d;
-}
-
-/* ========================================
-   LIGNES D'UTILISATEURS
-   ======================================== */
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row {
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
-    gap: 20px;
-    padding: 20px 30px;
-    background-color: white;
-    border-bottom: 1px solid #f0f0f0;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row:hover {
-    background-color: #f8f9fa;
-    transform: translateX(5px);
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row:last-child {
-    border-bottom: none;
-}
-
-/* Colonne USER ID */
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-id-column {
-    font-weight: 600;
-    font-size: 15px;
-    color: #7f8c8d;
-}
-
-/* Colonne du nom */
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-name-column {
-    font-weight: 600;
-    font-size: 15px;
-    color: #2c3e50;
-}
-
-/* Colonne du type de permission */
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column > div {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Styles par rôle */
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-admin {
-    background-color: #e8f4fd;
-    color: #3498db;
-    border: 2px solid #3498db;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-employe {
-    background-color: #d4edda;
-    color: #27ae60;
-    border: 2px solid #27ae60;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-magasinier {
-    background-color: #fff3cd;
-    color: #f39c12;
-    border: 2px solid #f39c12;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission {
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission:hover {
-    background-color: #e8f4fd;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission img {
-    width: 20px;
-    height: 20px;
-    filter: brightness(0.6);
-}
-
-/* ========================================
-   COLONNE DES ACTIONS
-   ======================================== */
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button,
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    background-color: transparent;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover,
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
-    transform: scale(1.1);
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
-    background-color: #e8f4fd;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
-    background-color: #d1ecf1;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button {
-    background-color: #fee;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover {
-    background-color: #fdd;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button img,
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user img {
-    width: 20px;
-    height: 20px;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:active,
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:active {
-    transform: scale(0.95);
-}
-
-/* ========================================
-   ÉTAT VIDE
-   ======================================== */
-
-.list-users-containers.empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    padding: 60px 20px;
-}
-
-.list-users-containers.empty::before {
-    content: '👥';
-    font-size: 80px;
-    margin-bottom: 20px;
-    opacity: 0.3;
-}
-
-.list-users-containers.empty::after {
-    content: 'Aucun utilisateur trouvé';
-    font-size: 18px;
-    color: #95a5a6;
-    font-weight: 500;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
+/* Media queries pour la mise en page générale */
 @media (max-width: 1306px) {
-    main .utilisateur-pannel-container .ajouter-utilisateurs {
-        left: 80px;
-    }
-}
-
-@media (max-width: 1024px) {
-    main .utilisateur-pannel-container .list-users-containers .list-users-title,
-    main .utilisateur-pannel-container .list-users-containers .list-users-row {
-        grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr;
-        gap: 15px;
-        padding: 15px 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    main .utilisateur-pannel-container .ajouter-utilisateurs {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    main .utilisateur-pannel-container {
-        padding-top: 140px; /* Plus d'espace en mobile car la barre est plus haute */
-    }
-
-    main .utilisateur-pannel-container .list-users-containers .list-users-title {
+    nav section div {
         display: none;
     }
 
-    main .utilisateur-pannel-container .list-users-containers .list-users-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 20px;
-        border-bottom: 2px solid #e0e0e0;
+    body nav {
+        width: 100px;
     }
 
-    main .utilisateur-pannel-container .list-users-containers .list-users-row > div {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    body nav section {
+        width: 70%;
     }
 
-    main .utilisateur-pannel-container .list-users-containers .list-users-row > div::before {
-        content: attr(data-label);
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #7f8c8d;
-    }
-
-    main .utilisateur-pannel-container .list-users-containers .list-users-row .actions {
-        justify-content: flex-start;
+    main {
+        margin-left: -150px;
     }
 }
 
 @media (max-width: 500px) {
-    main .utilisateur-pannel-container .ajouter-utilisateurs {
-        left: 0;
-        padding: 15px 20px;
+    nav {
+        width: 0;
+        display: none;
     }
 
-    main .utilisateur-pannel-container .pannel-title {
-        font-size: 24px;
-    }
-
-    main .utilisateur-pannel-container .list-users-containers {
-        border-radius: 12px;
-    }
-
-    main .utilisateur-pannel-container .list-users-containers .list-users-row {
-        padding: 15px;
+    main {
+        left: 40%;
     }
 }
