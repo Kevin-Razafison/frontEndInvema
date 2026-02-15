@@ -1,20 +1,21 @@
 /**
  * ========================================
- * DASHBOARD VIEWS - AMÉLIORÉ
+ * DASHBOARD VIEWS - VERSION AMÉLIORÉE
  * ========================================
  * 
  * Tableau de bord avec :
  * - Statistiques en temps réel
  * - Graphiques interactifs
- * - Export PDF/Excel
+ * - Export PDF/Excel fonctionnel
  * - Animations
  */
 
 import { fetchProducts } from "../../data/product.js";
 import { fetchRequests } from "../../data/request.js";
 import { Users } from "../../data/Users.js";
-import { fetchOrders } from "./commandes.views.js"; // on va utiliser cette fonction
+import { fetchOrders } from "./commandes.views.js";
 import { renderSection } from "../utils/render.js";
+import { exportDashboardReport } from "../utils/export.js";
 
 /**
  * Génère le tableau de bord complet
@@ -24,7 +25,7 @@ export async function DashBoard() {
         // Afficher un loader pendant le chargement
         showLoadingState();
 
-        // Récupérer toutes les données en parallèle pour meilleures performances
+        // Récupérer toutes les données en parallèle
         const [stock, requests, users, orders] = await Promise.all([
             fetchProducts(),
             fetchRequests(),
@@ -35,6 +36,9 @@ export async function DashBoard() {
         // Calculer les statistiques
         const stats = calculateStatistics(stock, requests, users, orders);
 
+        // Stocker les stats globalement pour l'export
+        window.dashboardStats = stats;
+
         // Générer le HTML
         const html = `
             ${renderOverviewSection(stats)}
@@ -42,6 +46,11 @@ export async function DashBoard() {
             ${renderActivitySection(requests, users, stock)}
             ${renderQuickActionsSection()}
         `;
+
+        // Attacher les événements après le rendu
+        setTimeout(() => {
+            attachDashboardEvents(stats);
+        }, 100);
 
         return html;
 
@@ -52,11 +61,122 @@ export async function DashBoard() {
 }
 
 /**
+ * Attache les événements du dashboard
+ */
+function attachDashboardEvents(stats) {
+    // Bouton Export PDF
+    const exportBtn = document.getElementById('export-dashboard-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', async () => {
+            try {
+                exportBtn.disabled = true;
+                exportBtn.innerHTML = '⏳ Export en cours...';
+                
+                await exportDashboardReport(stats);
+                
+                exportBtn.innerHTML = '✓ Exporté !';
+                setTimeout(() => {
+                    exportBtn.innerHTML = '📄 Exporter PDF';
+                    exportBtn.disabled = false;
+                }, 2000);
+            } catch (error) {
+                console.error('❌ Erreur export:', error);
+                exportBtn.innerHTML = '❌ Erreur';
+                setTimeout(() => {
+                    exportBtn.innerHTML = '📄 Exporter PDF';
+                    exportBtn.disabled = false;
+                }, 2000);
+            }
+        });
+    }
+
+    // Bouton Générer Rapport
+    const generateReportBtn = document.getElementById('generate-report-btn');
+    if (generateReportBtn) {
+        generateReportBtn.addEventListener('click', async () => {
+            await exportDashboardReport(stats);
+        });
+    }
+
+    // Initialiser les graphiques si Chart.js est chargé
+    if (typeof Chart !== 'undefined') {
+        initializeCharts(stats);
+    } else {
+        // Charger Chart.js dynamiquement
+        loadChartJS().then(() => {
+            initializeCharts(stats);
+        });
+    }
+
+    // Boutons d'action dans l'activité
+    attachActivityActionButtons();
+}
+
+/**
+ * Attache les boutons d'action des activités (approuver/rejeter)
+ */
+function attachActivityActionButtons() {
+    const approveButtons = document.querySelectorAll('.btn-approve');
+    const rejectButtons = document.querySelectorAll('.btn-reject');
+
+    approveButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const requestId = btn.dataset.requestId;
+            await handleRequestAction(requestId, 'APPROVED');
+        });
+    });
+
+    rejectButtons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const requestId = btn.dataset.requestId;
+            await handleRequestAction(requestId, 'REJECTER');
+        });
+    });
+}
+
+/**
+ * Gère l'approbation/rejet d'une requête
+ */
+async function handleRequestAction(requestId, status) {
+    try {
+        // Implémenter votre logique d'API ici
+        console.log(`${status === 'APPROVED' ? '✓' : '✗'} Requête #${requestId} ${status}`);
+        
+        // Recharger le dashboard après l'action
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ Erreur:', error);
+        alert('Erreur lors du traitement de la requête');
+    }
+}
+
+/**
+ * Charge Chart.js dynamiquement
+ */
+function loadChartJS() {
+    return new Promise((resolve, reject) => {
+        if (typeof Chart !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+/**
  * Calcule toutes les statistiques nécessaires
  */
 function calculateStatistics(stock, requests, users, orders) {
     // Stocks faibles (quantity <= alertLevel)
-    const lowStocks = stock.filter(p => p.quantity <= p.alertLevel);
+    const lowStocks = stock.filter(p => p.quantity <= (p.alertLevel || 10));
 
     // Commandes en attente
     const pendingOrders = orders.filter(o => o.status === "PENDING");
@@ -110,6 +230,7 @@ function calculateStatistics(stock, requests, users, orders) {
 
     return {
         lowStocks: lowStocks.length,
+        lowStocksData: lowStocks,
         pendingOrders: pendingOrders.length,
         pendingRequests: pendingRequests.length,
         approvedToday: approvedToday.length,
@@ -119,7 +240,10 @@ function calculateStatistics(stock, requests, users, orders) {
         activeUsers,
         topProducts,
         requestTrend,
-        stockByCategory
+        stockByCategory,
+        allStock: stock,
+        allRequests: requests,
+        allOrders: orders
     };
 }
 
@@ -210,7 +334,7 @@ function renderOverviewSection(stats) {
     ];
 
     const cardsHTML = cards.map((card, index) => `
-        <div class="stats-card card-${index}" data-color="${card.color}">
+        <div class="stats-card card-${index}" data-color="${card.color}" style="--card-color: ${card.color}">
             <div class="card-header">
                 <div class="card-title">${card.title}</div>
                 <img src="./src/icons/${card.icon}" alt="${card.title}" class="card-icon">
@@ -218,7 +342,6 @@ function renderOverviewSection(stats) {
             <div class="card-value">${card.value}</div>
             <div class="card-footer">
                 <div class="trend ${card.trend}">
-                    <i class="trend-icon"></i>
                     <span>Temps réel</span>
                 </div>
             </div>
@@ -266,75 +389,38 @@ function renderChartsSection(stats) {
         <div class="section-header">
             <h2 class="section-title">📈 Analyses & Tendances</h2>
         </div>
-        
         <div class="charts-grid">
             <div class="chart-container">
-                <h3 class="chart-title">Tendance des requêtes (7 derniers jours)</h3>
+                <div class="chart-title">📊 Tendance des requêtes (7 jours)</div>
                 <canvas id="requests-trend-chart"></canvas>
             </div>
-            
             <div class="chart-container">
-                <h3 class="chart-title">Distribution des stocks par catégorie</h3>
+                <div class="chart-title">🎯 Distribution par catégorie</div>
                 <canvas id="stock-category-chart"></canvas>
             </div>
-            
             <div class="chart-container">
-                <h3 class="chart-title">Produits les plus demandés</h3>
-                <div id="top-products-list">
-                    ${renderTopProducts(stats.topProducts)}
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <h3 class="chart-title">Valeur par catégorie</h3>
+                <div class="chart-title">💰 Valeur par catégorie</div>
                 <canvas id="value-category-chart"></canvas>
             </div>
+            <div class="chart-container">
+                <div class="chart-title">🔝 Top 5 produits demandés</div>
+                <canvas id="top-products-chart"></canvas>
+            </div>
         </div>
-        
-        <script>
-            // Initialiser les graphiques après le rendu
-            setTimeout(() => {
-                initializeCharts(${JSON.stringify(stats)});
-            }, 100);
-        </script>
     `);
-}
-
-/**
- * Rendu de la liste des produits les plus demandés
- */
-function renderTopProducts(topProducts) {
-    if (!topProducts || topProducts.length === 0) {
-        return '<p class="empty-message">Aucune donnée disponible</p>';
-    }
-
-    return topProducts.map((item, index) => `
-        <div class="top-product-item">
-            <div class="rank">#${index + 1}</div>
-            <div class="product-info">
-                <div class="product-name">${item.product?.name || 'Inconnu'}</div>
-                <div class="product-category">${item.product?.category?.name || '-'}</div>
-            </div>
-            <div class="request-count">
-                <span class="count-badge">${item.count}</span>
-                <span class="count-label">demandes</span>
-            </div>
-        </div>
-    `).join('');
 }
 
 /**
  * Section Activités récentes
  */
-function renderActivitySection(requests, users, stock) {
-    // Prendre les 10 dernières requêtes
+function renderActivitySection(requests, users, products) {
     const recentRequests = requests
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 10);
 
     const activitiesHTML = recentRequests.map(request => {
         const user = users.find(u => u.id === request.userId);
-        const product = stock.find(p => p.id === request.productId);
+        const product = products.find(p => p.id === request.productId);
         
         const statusBadge = getStatusBadge(request.status);
         const timeAgo = getTimeAgo(new Date(request.createdAt));
@@ -361,8 +447,8 @@ function renderActivitySection(requests, users, stock) {
                 </div>
                 ${request.status === 'PENDING' ? `
                     <div class="activity-actions">
-                        <button class="btn-approve" data-request-id="${request.id}">✓</button>
-                        <button class="btn-reject" data-request-id="${request.id}">✗</button>
+                        <button class="btn-approve" data-request-id="${request.id}" title="Approuver">✓</button>
+                        <button class="btn-reject" data-request-id="${request.id}" title="Rejeter">✗</button>
                     </div>
                 ` : ''}
             </div>
@@ -503,81 +589,115 @@ function renderErrorState() {
 }
 
 /**
- * Initialise les graphiques (à appeler après le rendu)
+ * Initialise les graphiques
  */
-window.initializeCharts = function(stats) {
-    // Ce code sera exécuté dans le navigateur
-    // Il nécessite une bibliothèque de graphiques comme Chart.js
-    
-    console.log('📊 Initialisation des graphiques avec:', stats);
-    
-    // Exemple avec Chart.js (à inclure dans le HTML)
-    if (typeof Chart !== 'undefined') {
-        // Graphique de tendance des requêtes
-        const trendCtx = document.getElementById('requests-trend-chart');
-        if (trendCtx) {
-            new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: stats.requestTrend.map(t => t.date),
-                    datasets: [{
-                        label: 'Requêtes',
-                        data: stats.requestTrend.map(t => t.count),
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        }
-        
-        // Graphique de distribution par catégorie
-        const categoryCtx = document.getElementById('stock-category-chart');
-        if (categoryCtx) {
-            new Chart(categoryCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: stats.stockByCategory.map(c => c.name),
-                    datasets: [{
-                        data: stats.stockByCategory.map(c => c.count),
-                        backgroundColor: [
-                            '#3498db', '#e74c3c', '#f39c12', 
-                            '#27ae60', '#9b59b6', '#1abc9c'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        }
-        
-        // Graphique de valeur par catégorie
-        const valueCtx = document.getElementById('value-category-chart');
-        if (valueCtx) {
-            new Chart(valueCtx, {
-                type: 'bar',
-                data: {
-                    labels: stats.stockByCategory.map(c => c.name),
-                    datasets: [{
-                        label: 'Valeur (Ar)',
-                        data: stats.stockByCategory.map(c => c.value),
-                        backgroundColor: '#27ae60'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        }
+function initializeCharts(stats) {
+    if (typeof Chart === 'undefined') {
+        console.warn('⚠️ Chart.js non chargé');
+        return;
     }
-};
+
+    // Configuration commune
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    };
+
+    // Graphique de tendance des requêtes
+    const trendCtx = document.getElementById('requests-trend-chart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: stats.requestTrend.map(t => t.date),
+                datasets: [{
+                    label: 'Requêtes',
+                    data: stats.requestTrend.map(t => t.count),
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: commonOptions
+        });
+    }
+
+    // Graphique de distribution par catégorie
+    const categoryCtx = document.getElementById('stock-category-chart');
+    if (categoryCtx) {
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: stats.stockByCategory.map(c => c.name),
+                datasets: [{
+                    data: stats.stockByCategory.map(c => c.count),
+                    backgroundColor: [
+                        '#3498db', '#e74c3c', '#f39c12', 
+                        '#27ae60', '#9b59b6', '#1abc9c'
+                    ]
+                }]
+            },
+            options: commonOptions
+        });
+    }
+
+    // Graphique de valeur par catégorie
+    const valueCtx = document.getElementById('value-category-chart');
+    if (valueCtx) {
+        new Chart(valueCtx, {
+            type: 'bar',
+            data: {
+                labels: stats.stockByCategory.map(c => c.name),
+                datasets: [{
+                    label: 'Valeur (Ar)',
+                    data: stats.stockByCategory.map(c => c.value),
+                    backgroundColor: '#27ae60'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Graphique des top produits
+    const topProductsCtx = document.getElementById('top-products-chart');
+    if (topProductsCtx) {
+        new Chart(topProductsCtx, {
+            type: 'bar',
+            data: {
+                labels: stats.topProducts.map(p => p.product?.name || 'Inconnu'),
+                datasets: [{
+                    label: 'Nombre de demandes',
+                    data: stats.topProducts.map(p => p.count),
+                    backgroundColor: '#3498db'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    console.log('✅ Graphiques initialisés');
+}
 
 // Export
 export { DashBoard as default };

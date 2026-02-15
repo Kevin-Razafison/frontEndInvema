@@ -1,5 +1,5 @@
 /* ========================================
-   HEADER - BARRE DE NAVIGATION SUPÉRIEURE
+   HEADER - STYLES MODERNES
    ======================================== */
 
 header {
@@ -19,88 +19,73 @@ header {
 }
 
 /* ========================================
-   SECTION GAUCHE
+   LEFT SECTION
    ======================================== */
-
 header .left-section {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Menu hamburger (mobile) */
-header .left-section .hamburger-menu {
-    width: 50px;
-    height: 50px;
+header .hamburger-menu {
+    width: 40px;
+    height: 40px;
     display: none;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     border-radius: 8px;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-header .left-section .hamburger-menu:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+header .hamburger-menu:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
-header .left-section .hamburger-menu:active {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(0.95);
-}
-
-header .left-section .hamburger-menu img {
-    width: 28px;
-    height: 28px;
+header .hamburger-menu img {
+    width: 24px;
+    height: 24px;
     filter: brightness(0) invert(1);
 }
 
-/* Container du logo */
 header .logo-container {
     display: flex;
     align-items: center;
-    gap: 15px;
-    color: white;
-    height: 100%;
+    gap: 12px;
 }
 
 header .logo-container .logo-image {
+    height: 35px;
     width: auto;
-    height: 40px;
-    object-fit: contain;
 }
 
 header .logo-container .board {
-    font-size: 18px;
+    color: white;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
-    background: linear-gradient(90deg, #fff 0%, #e0e0e0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 /* ========================================
-   SECTION DROITE
+   RIGHT SECTION
    ======================================== */
-
 header .right-section {
     display: flex;
     align-items: center;
-    gap: 20px;
-    height: 100%;
+    gap: 15px;
 }
 
-/* Recherche globale */
-header .right-section .global-search {
+/* ========================================
+   RECHERCHE GLOBALE
+   ======================================== */
+header .global-search {
     position: relative;
 }
 
-header .right-section .global-search input {
-    width: 250px;
-    height: 36px;
-    border-radius: 18px;
+header .global-search input {
+    width: 280px;
+    height: 38px;
+    border-radius: 19px;
     border: none;
     padding: 0 40px 0 15px;
     font-size: 14px;
@@ -109,96 +94,138 @@ header .right-section .global-search input {
     transition: all 0.3s ease;
 }
 
-header .right-section .global-search input::placeholder {
+header .global-search input::placeholder {
     color: rgba(255, 255, 255, 0.6);
 }
 
-header .right-section .global-search input:focus {
+header .global-search input:focus {
     outline: none;
     background: rgba(255, 255, 255, 0.25);
-    width: 300px;
+    width: 320px;
 }
 
-header .right-section .global-search:after {
-    content: '🔍';
+header .global-search .search-icon {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 16px;
-    opacity: 0.7;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.6);
 }
 
-/* Container de notifications */
-header .right-section .notification-container {
+/* ========================================
+   NOTIFICATIONS
+   ======================================== */
+.notification-container {
     position: relative;
+}
+
+.notification-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-header .right-section .notification-container:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.notification-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
 }
 
-header .right-section .notification-container img {
-    width: 24px;
-    height: 24px;
+.notification-btn img {
+    width: 20px;
+    height: 20px;
     filter: brightness(0) invert(1);
 }
 
-/* Badge de notification */
-header .right-section .notification-container .notification-badge {
+.notification-badge {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: #e74c3c;
+    top: -2px;
+    right: -2px;
+    background: #e74c3c;
     color: white;
     font-size: 10px;
     font-weight: bold;
     min-width: 18px;
     height: 18px;
-    border-radius: 50%;
-    display: flex;
+    border-radius: 9px;
+    display: none;
     align-items: center;
     justify-content: center;
-    padding: 2px;
     border: 2px solid #142536;
+    animation: pulse 2s infinite;
 }
 
-/* Dropdown de notifications */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
 .notification-dropdown {
     position: absolute;
-    top: 45px;
+    top: 50px;
     right: 0;
-    width: 320px;
+    width: 350px;
+    max-height: 400px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     display: none;
+    overflow: hidden;
     z-index: 1001;
+    animation: slideDown 0.3s ease-out;
 }
 
-.notification-dropdown .notification-header {
-    padding: 15px;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-dropdown.active {
+    display: block;
+}
+
+.notification-header {
+    padding: 15px 20px;
     border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #f8f9fa;
 }
 
-.notification-dropdown .notification-header h3 {
+.notification-header h3 {
     font-size: 16px;
-    color: #333;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 600;
 }
 
-.notification-dropdown .notification-header .mark-all-read {
+.mark-all-read {
     background: none;
     border: none;
     color: #3498db;
     font-size: 12px;
     cursor: pointer;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.mark-all-read:hover {
+    color: #2980b9;
 }
 
 .notification-list {
@@ -207,190 +234,258 @@ header .right-section .notification-container .notification-badge {
 }
 
 .notification-item {
-    display: flex;
-    gap: 12px;
-    padding: 12px 15px;
+    padding: 15px 20px;
     border-bottom: 1px solid #f5f5f5;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
 }
 
 .notification-item:hover {
     background: #f9f9f9;
 }
 
-.notification-item .notification-icon {
-    width: 32px;
-    height: 32px;
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-icon {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
-.notification-item .notification-icon.approved {
+.notification-icon.pending {
+    background: #fff3cd;
+    color: #f39c12;
+}
+
+.notification-icon.approved {
     background: #d4edda;
     color: #27ae60;
 }
 
-.notification-item .notification-icon.rejecter {
-    background: #fee;
+.notification-icon.rejecter {
+    background: #f8d7da;
     color: #e74c3c;
 }
 
-.notification-item .notification-content {
+.notification-content {
     flex: 1;
 }
 
-.notification-item .notification-title {
-    font-weight: 600;
+.notification-title {
     font-size: 14px;
-    color: #333;
-    margin-bottom: 3px;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
-.notification-item .notification-details {
-    display: flex;
-    gap: 8px;
+.notification-details {
     font-size: 12px;
-    color: #888;
+    color: #7f8c8d;
+    display: flex;
+    justify-content: space-between;
 }
 
-.notification-item .notification-action {
+.notification-action {
     background: none;
     border: none;
-    font-size: 16px;
+    color: #3498db;
     cursor: pointer;
-    color: #aaa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
-.notification-item .notification-action:hover {
-    color: #3498db;
+.notification-action:hover {
+    background: #e3f2fd;
+}
+
+.notification-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.notification-empty i {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
 }
 
 .notification-footer {
-    padding: 10px 15px;
+    padding: 12px 20px;
     text-align: center;
     border-top: 1px solid #eee;
+    background: #f8f9fa;
 }
 
 .notification-footer a {
     color: #3498db;
     text-decoration: none;
     font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
-.notification-empty {
-    padding: 30px;
-    text-align: center;
-    color: #aaa;
+.notification-footer a:hover {
+    color: #2980b9;
 }
 
-.notification-empty i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-/* Profil utilisateur */
-header .right-section .user-profile-menu {
+/* ========================================
+   PROFIL UTILISATEUR
+   ======================================== */
+.user-profile-menu {
     position: relative;
 }
 
-header .right-section .profile-btn {
+.profile-btn {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    cursor: pointer;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
-    transition: background 0.2s;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-header .right-section .profile-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+.profile-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
-header .right-section .user-avatar {
-    width: 36px;
-    height: 36px;
+.user-avatar {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, #3498db, #2980b9);
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 13px;
     font-weight: 600;
-    font-size: 14px;
+    color: white;
 }
 
-header .right-section .user-name {
+.user-name {
     font-size: 14px;
     font-weight: 500;
+}
+
+.profile-btn i {
+    font-size: 10px;
 }
 
 .profile-dropdown {
     position: absolute;
     top: 50px;
     right: 0;
-    width: 250px;
+    width: 260px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     display: none;
+    overflow: hidden;
     z-index: 1001;
+    animation: slideDown 0.3s ease-out;
 }
 
-.profile-dropdown .profile-info {
+.profile-dropdown.active {
+    display: block;
+}
+
+.profile-info {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
     display: flex;
     gap: 12px;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-.profile-dropdown .profile-avatar {
+.profile-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #3498db;
+    background: linear-gradient(135deg, #3498db, #2980b9);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: 600;
     font-size: 18px;
-}
-
-.profile-dropdown .profile-details {
-    flex: 1;
-}
-
-.profile-dropdown .profile-name {
     font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 3px;
+    flex-shrink: 0;
 }
 
-.profile-dropdown .profile-email {
+.profile-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-email {
     font-size: 12px;
-    color: #888;
+    color: #7f8c8d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: #e74c3c;
+    color: white;
+}
+
+.role-badge.magasinier {
+    background: #3498db;
+    color: white;
+}
+
+.role-badge.employe {
+    background: #27ae60;
+    color: white;
 }
 
 .profile-menu-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    color: #333;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #2c3e50;
     text-decoration: none;
-    transition: background 0.2s;
+    background: none;
+    border: none;
     width: 100%;
     text-align: left;
-    border: none;
-    background: none;
     cursor: pointer;
+    transition: all 0.2s ease;
     font-size: 14px;
 }
 
@@ -399,91 +494,121 @@ header .right-section .user-name {
 }
 
 .profile-menu-item i {
-    width: 20px;
-    color: #888;
+    width: 18px;
+    color: #7f8c8d;
 }
 
 .profile-menu-divider {
-    margin: 5px 0;
+    margin: 0;
     border: none;
     border-top: 1px solid #eee;
 }
 
-/* Bouton de déconnexion (ancien) */
-header .right-section .logout-button {
-    padding: 8px 20px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+/* ========================================
+   SCROLLBAR PERSONNALISÉ
+   ======================================== */
+.notification-list::-webkit-scrollbar,
+.search-results::-webkit-scrollbar {
+    width: 6px;
 }
 
-header .right-section .logout-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-1px);
+.notification-list::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-header .right-section .logout-button:active {
-    transform: translateY(0);
-    background-color: rgba(255, 255, 255, 0.15);
+.notification-list::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
 }
 
 /* ========================================
-   RESPONSIVE
+   RESPONSIVE DESIGN
    ======================================== */
-
 @media (max-width: 768px) {
     header {
         padding: 0 15px;
     }
 
-    header .logo-container .board {
-        font-size: 14px;
-    }
-
-    header .right-section {
-        gap: 10px;
-    }
-
-    header .right-section .global-search input {
-        width: 180px;
-    }
-
-    header .right-section .global-search input:focus {
+    header .global-search input {
         width: 200px;
+    }
+
+    header .global-search input:focus {
+        width: 220px;
+    }
+
+    .notification-dropdown,
+    .profile-dropdown {
+        width: 300px;
     }
 }
 
 @media (max-width: 500px) {
-    /* Afficher le menu hamburger */
-    header .left-section .hamburger-menu {
+    header .hamburger-menu {
         display: flex;
-    }
-
-    header .logo-container .logo-image {
-        height: 32px;
     }
 
     header .logo-container .board {
         display: none;
     }
 
-    header .right-section .global-search {
+    header .global-search {
         display: none;
     }
 
-    header .right-section .user-name {
+    header .user-name {
         display: none;
+    }
+
+    .notification-dropdown,
+    .profile-dropdown {
+        width: calc(100vw - 40px);
+        right: -10px;
     }
 }
 
-@media (max-width: 320px) {
+/* ========================================
+   DARK MODE (optionnel)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
     header {
-        padding: 0 10px;
+        background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
     }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+.notification-btn:focus,
+.profile-btn:focus,
+.mark-all-read:focus,
+.notification-action:focus,
+.profile-menu-item:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Smooth transitions */
+* {
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
 }
