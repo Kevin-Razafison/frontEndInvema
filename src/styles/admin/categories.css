@@ -64,7 +64,7 @@ main section .add-categorie {
     position: absolute;
     top: -25px;
     width: 200px;
-    left: 15px;
+    right: 15px;
 }
 
 main section .delete-categorie {
