@@ -1,39 +1,29 @@
+// index.js corrigé
 import { interactiveNavBar } from "./views/NavBar.views.js";
-import { render} from "./utils/render.js";
 import { initRouter } from "./utils/render.js";
 import { logout } from "./logout/logout.js";
 
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
+// Redirection si non connecté
 if (!token) {
-  // Pas connecté → redirige vers login
   window.location.replace("./login.html");
 } else {
-  // Déjà connecté → selon le rôle
-  if (role === "ADMIN") {
-    // Laisse le sur index.html (dashboard admin)
-    console.log("Bienvenue Admin");
-  } else {
-    // Autre rôle → redirige vers user.html
+  // Vérifier que l'utilisateur a le droit d'être sur cette page
+  if (role !== "ADMIN" && role !== "MAGASINIER") {
+    // Rediriger vers l'espace employé
     window.location.replace("./user.html");
+  } else {
+    // Lancer le routeur (il chargera la route en fonction du hash)
+    initRouter();
+    // Activer la navigation latérale
+    interactiveNavBar();
+
+    // Gestion du bouton de déconnexion
+    const logoutBtn = document.querySelector(".logout-button");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", logout);
+    }
   }
-}
-
-render("#/dashboard");
-initRouter();
-interactiveNavBar();
-
-const payload = JSON.parse(atob(token.split(".")[1]));
-
-if(payload.role === "ADMIN"){
-    window.addEventListener("popstate", ()=> render('#/'));
-}
-else if(payload.role === "EMPLOYE"){
-    window.addEventListener("popstate", ()=> render('#/simpleUser'));
-}
-
-const logoutBtn = document.querySelector(".logout-button");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", logout);
 }
