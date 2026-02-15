@@ -44,11 +44,14 @@ body {
    CONTAINER PRINCIPAL
    ======================================== */
 main {
+    position: relative;
     margin-left: 250px;
     margin-top: 60px;
+    margin-right: 0;
     padding: 25px;
     min-height: calc(100vh - 60px);
     transition: margin-left 0.3s ease;
+    width: auto;
 }
 
 /* ========================================
