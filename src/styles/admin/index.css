@@ -45,12 +45,12 @@ body {
    CONTAINER PRINCIPAL
    ======================================== */
 main {
-    margin-left: 250px;  /* Aligné avec la largeur de la nav */
+    margin-left: 250px;  /* Espace pour la nav */
     margin-top: 60px;
     padding: 25px;
     min-height: calc(100vh - 60px);
     transition: margin-left 0.3s ease;
-    width: calc(100% - 250px);
+    /* Suppression du width pour éviter le double décalage */
     max-width: 100%;
 }
 
@@ -371,7 +371,6 @@ tr:hover {
 
     main {
         margin-left: 100px;  /* Ajusté pour correspondre à la nav condensée */
-        width: calc(100% - 100px);
     }
 }
 
@@ -393,7 +392,6 @@ tr:hover {
     main {
         margin-left: 0;
         padding: 15px;
-        width: 100%;
     }
 
     /* Overlay pour fermer la nav mobile */
