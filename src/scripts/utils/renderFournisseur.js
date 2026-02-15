@@ -1,10 +1,9 @@
 import { getImageUrl } from "../../data/apiUrl.js";
 import { fournisseursCards, updateSupplier, deleteSupplier } from "../../data/Fournisseurs.js";
-import { interactiveNavBar } from "../views/NavBar.views.js";
 import { render, renderSection } from "./render.js";
 
 function navigate(route) {
-   window.location.hash = route;
+    window.location.hash = route;
 }
 
 export async function renderFournisseur(fournisseurId) {
@@ -136,53 +135,70 @@ export async function renderFournisseur(fournisseurId) {
 
 export function previousButton() {
     const previous = document.querySelector(".previous");
-    if (!previous) return;
+    if (!previous) {
+        console.warn("Bouton retour non trouvé");
+        return;
+    }
 
-    previous.addEventListener('click', () => {
-        navigate("#/fournisseurs");
+    // Supprimer les anciens écouteurs pour éviter les doublons
+    previous.replaceWith(previous.cloneNode(true));
+    const newPrevious = document.querySelector(".previous");
+    
+    newPrevious.addEventListener('click', () => {
+        render("#/fournisseurs"); // Utiliser render au lieu de navigate
     });
 }
 
 export async function modifierButton() {
     const modifier = document.querySelector(".Modifier");
-    if (!modifier) return;
+    if (!modifier) {
+        console.warn("Bouton Modifier non trouvé");
+        return;
+    }
 
-    modifier.addEventListener("click", () => {
-        // Passer en mode édition
+    // Nettoyer les anciens écouteurs
+    modifier.replaceWith(modifier.cloneNode(true));
+    const newModifier = document.querySelector(".Modifier");
+
+    newModifier.addEventListener("click", () => {
         const viewMode = document.querySelector(".view-mode");
         const editMode = document.querySelector(".edit-mode");
         const buttonContainer = document.querySelector(".image-side .button-container");
+        const inputFile = document.querySelector(".input-file");
         
         if (!viewMode || !editMode || !buttonContainer) {
-            console.error("Éléments manquants");
+            console.error("Éléments manquants pour le mode édition");
             return;
         }
         
+        // Basculer les modes
         viewMode.style.display = "none";
         editMode.style.display = "block";
         buttonContainer.style.display = "none";
-        
-        // Afficher le champ de fichier
-        const inputFile = document.querySelector(".input-file");
-        if (inputFile) {
-            inputFile.style.display = "block";
-        }
-        
-        // Gérer l'annulation
+        if (inputFile) inputFile.style.display = "block";
+
+        // Gérer l'annulation (en nettoyant les anciens écouteurs)
         const annulerBtn = document.querySelector(".annuler-modif");
         if (annulerBtn) {
-            annulerBtn.addEventListener("click", () => {
+            annulerBtn.replaceWith(annulerBtn.cloneNode(true));
+            const newAnnuler = document.querySelector(".annuler-modif");
+            newAnnuler.addEventListener("click", (e) => {
+                e.preventDefault();
                 viewMode.style.display = "block";
                 editMode.style.display = "none";
                 buttonContainer.style.display = "flex";
                 if (inputFile) inputFile.style.display = "none";
             });
         }
-        
+
         // Gérer la confirmation
         const terminerBtn = document.querySelector(".terminer-modif");
         if (terminerBtn) {
-            terminerBtn.addEventListener("click", async () => {
+            terminerBtn.replaceWith(terminerBtn.cloneNode(true));
+            const newTerminer = document.querySelector(".terminer-modif");
+            newTerminer.addEventListener("click", async (e) => {
+                e.preventDefault();
+                
                 const informationContainer = document.querySelector(".information-container");
                 const supplierID = Number(informationContainer?.dataset.supplierId);
                 
@@ -196,7 +212,6 @@ export async function modifierButton() {
                     return;
                 }
                 
-                // Validation email
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
                     alert("⚠️ Email invalide");
@@ -204,8 +219,8 @@ export async function modifierButton() {
                 }
 
                 try {
-                    terminerBtn.disabled = true;
-                    terminerBtn.textContent = "⏳ Modification...";
+                    newTerminer.disabled = true;
+                    newTerminer.textContent = "⏳ Modification...";
                     
                     const formData = new FormData();
                     formData.append("phone", phone);
@@ -221,17 +236,16 @@ export async function modifierButton() {
                     const updated = await updateSupplier(supplierID, formData);
                     
                     if (updated) {
-                        // Recharger la page
-                        window.location.hash = `#/fournisseurs/pannel`;
-                        window.location.reload();
+                        // Recharger la vue du fournisseur
+                        render("#/fournisseurs/pannel", supplierID);
                     } else {
                         throw new Error("Échec de la modification");
                     }
                 } catch (err) {
                     console.error('❌ Erreur:', err);
                     alert("❌ Erreur lors de la modification: " + err.message);
-                    terminerBtn.disabled = false;
-                    terminerBtn.textContent = "✓ Confirmer";
+                    newTerminer.disabled = false;
+                    newTerminer.textContent = "✓ Confirmer";
                 }
             });
         }
@@ -242,7 +256,10 @@ export async function SupprimerButton() {
     const supprimer = document.querySelector(".Supprimer");
     if (!supprimer) return;
     
-    supprimer.addEventListener('click', async () => {
+    supprimer.replaceWith(supprimer.cloneNode(true));
+    const newSupprimer = document.querySelector(".Supprimer");
+    
+    newSupprimer.addEventListener('click', async () => {
         const informationContainer = document.querySelector(".information-container");
         const supplierID = Number(informationContainer?.dataset.supplierId);
         
@@ -251,21 +268,21 @@ export async function SupprimerButton() {
         }
         
         try {
-            supprimer.disabled = true;
-            supprimer.textContent = "⏳ Suppression...";
+            newSupprimer.disabled = true;
+            newSupprimer.textContent = "⏳ Suppression...";
             
             const success = await deleteSupplier(supplierID);
             
             if (success) {
-                navigate("#/fournisseurs");
+                render("#/fournisseurs");
             } else {
                 throw new Error("Échec de la suppression");
             }
         } catch (err) {
             console.error('❌ Erreur:', err);
             alert("❌ Erreur lors de la suppression: " + err.message);
-            supprimer.disabled = false;
-            supprimer.textContent = "🗑️ Supprimer";
+            newSupprimer.disabled = false;
+            newSupprimer.textContent = "🗑️ Supprimer";
         }
     });
 }

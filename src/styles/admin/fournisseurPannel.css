@@ -354,7 +354,16 @@ button.terminer-modif:hover {
 }
 
 .edit-mode {
-    display: none;
+    display: none; /* caché par défaut, sera changé par JS */
+}
+
+.edit-mode input {
+    display: block; /* forcer l'affichage */
+}
+
+/* Curseur pointer pour le bouton retour */
+.previous {
+    cursor: pointer;
 }
 
 /* Info item en mode lecture */
