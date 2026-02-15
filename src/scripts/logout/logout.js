@@ -160,7 +160,7 @@ function showLogoutSuccess() {
  */
 function redirectToLogin() {
     // Utiliser replace pour éviter le retour arrière
-    window.location.replace("./login.html");
+    window.location.replace("./index.html");
 }
 
 /**
