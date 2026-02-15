@@ -24,10 +24,8 @@ export async function gestionUtilisateur() {
                 <div class="user-name-column">
                     ${user.name}
                 </div>
-                <div class="user-permission-type-column">
-                    <div>
-                        ${user.role}
-                    </div>
+               <div class="user-permission-type-column">
+                    <div class="role-${user.role.toLowerCase()}">${user.role}</div>
                 </div>
                 <div class="actions">
                     <div class="delete-user-button button" data-user-id="${user.id}">
