@@ -57,8 +57,9 @@ body .popUp {
 
 body .popUp .popup-header {
     padding: 20px 25px;
-    background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
-    color: white;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1e293b;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -68,15 +69,17 @@ body .popUp .popup-header h3 {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
+    color: #1e293b;
 }
+
 
 body .popUp .popup-header .close-button {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #f1f5f9;
     border: none;
-    color: white;
+    color: #64748b;
     font-size: 20px;
     cursor: pointer;
     display: flex;
@@ -86,7 +89,8 @@ body .popUp .popup-header .close-button {
 }
 
 body .popUp .popup-header .close-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: #e2e8f0;
+    color: #1e293b;
     transform: rotate(90deg);
 }
 

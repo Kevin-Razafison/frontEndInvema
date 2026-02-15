@@ -1,3 +1,8 @@
+/* ========================================
+   COMMANDES.CSS - THÈME BLANC
+   Adapté pour s'intégrer au thème global clair
+   ======================================== */
+
 main .order-management-container {
     width: 1300px;
     height: 100%;
@@ -5,16 +10,19 @@ main .order-management-container {
 
 main .order-management-container .order-management-title {
     font-size: 30px;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 25px;
+    color: #1e293b;
 }
 
+/* Barre de catégories (filtres) */
 main .order-management-container .categories-order {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 35px;
+    height: 40px;
     justify-content: start;
+    gap: 20px;
 }
 
 main .order-management-container .categories-choice {
@@ -23,11 +31,15 @@ main .order-management-container .categories-choice {
     justify-content: space-between;
     align-items: center;
     background-color: white;
-    margin-right: 20px;
     position: relative;
-    border-radius: 5px;
-    overflow: none;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e2e8f0;
+    transition: box-shadow 0.2s ease;
+}
+
+main .order-management-container .categories-choice:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 main .order-management-container .categories-choice .div-button {
@@ -36,39 +48,63 @@ main .order-management-container .categories-choice .div-button {
     justify-content: center;
     width: 80px;
     height: 100%;
-    color: black;
-    margin-right: 12px;
+    color: #334155;
     cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease;
 }
+
+main .order-management-container .categories-choice .div-button:hover {
+    color: #3498db;
+}
+
 main .order-management-container .historique-command-button {
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: white;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 0 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e2e8f0;
     cursor: pointer;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.2s ease;
 }
+
+main .order-management-container .historique-command-button:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
 main .order-management-container .historique-command-button:active {
     opacity: 0.7;
 }
 
+/* Ligne de soulignement des onglets */
 main .categories-choice .underline {
     position: absolute;
-    bottom: 0px;
-    height: 2px;
+    bottom: -1px;
+    height: 3px;
     width: 90px;
-    background-color: blue;
+    background-color: #3498db;
+    border-radius: 3px 3px 0 0;
+    transition: transform 0.3s ease;
 }
 
+/* Partie principale (tableau des commandes) */
 main .order-management-container .part {
     width: 90%;
     height: 400px;
     margin-top: 35px;
-    background-color: #c4c4c4;
+    background-color: #f8fafc;
     border-radius: 12px;
     margin-bottom: 50px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 main .order-management-container .part .title-row {
@@ -79,38 +115,56 @@ main .order-management-container .part .title-row {
     height: 40px;
     padding-top: 15px;
     padding-left: 25px;
-    color: #494949;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 main .order-management-container .part .row-container {
-    border-radius: 12px;
-    width: 93%;
-    margin-left: 10px;
+    flex: 1;
+    overflow-y: auto;
     background-color: white;
-    overflow: scroll;
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
-main .order-management-container .part .title-row .stock {
-    display: flex;
-    justify-content: center;
-}
 main .order-management-container .part .row {
     display: grid;
     grid-template-columns: 200px 100px 200px 100px 100px 10px 50px;
     column-gap: 50px;
     width: 97%;
-    height: 40px;
-    color: #494949;
-    margin-bottom: 12px;
+    min-height: 40px;
+    color: #1e293b;
+    margin: 5px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
 }
+
+main .order-management-container .part .row:hover {
+    background-color: #fafcff;
+}
+
+main .order-management-container .part .row .row-content {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
 main .order-management-container .part .row .stock-count {
     display: flex;
     justify-content: center;
+    font-weight: 500;
 }
 
 main .order-management-container .part .row .order-id {
     width: 100%;
     display: flex;
+    align-items: center;
 }
 
 main .order-management-container .part .order-id .id {
@@ -118,11 +172,8 @@ main .order-management-container .part .order-id .id {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-main .order-management-container .part .row .row-content {
-    display: flex;
-    align-items: center;
+    font-weight: 600;
+    color: #3498db;
 }
 
 main .order-id .name-product {
@@ -131,17 +182,21 @@ main .order-id .name-product {
     align-items: center;
 }
 
+/* Seconde partie (détails ?) */
 main .second-part .title-part {
-    padding-top: 12px;
-    padding-left: 12px;
-    font-weight: bold;
+    padding: 12px;
+    font-weight: 600;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .second-part .row-container {
-    overflow: scroll;
+    overflow: auto;
 }
 
-/* Conteneur du pop-up */
+/* ========================================
+   POPUP SPÉCIFIQUE AUX COMMANDES
+   ======================================== */
 .popup-container {
     position: fixed;
     top: 0;
@@ -153,34 +208,39 @@ main .second-part .title-part {
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    backdrop-filter: blur(3px);
 }
 
-/* Pop-up principal */
 .popup {
-    background-color: #fff;
+    background-color: white;
     border-radius: 12px;
     padding: 30px 25px;
     width: 400px;
     max-width: 90%;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
     gap: 15px;
     text-align: center;
 }
 
-/* Input quantité */
 .popup .qty-input {
     width: 80px;
     padding: 8px;
     margin: 10px auto;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     text-align: center;
+    transition: border-color 0.2s ease;
 }
 
-/* Boutons du pop-up */
+.popup .qty-input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+}
+
 .popup .popup-buttons {
     display: flex;
     justify-content: center;
@@ -190,50 +250,40 @@ main .second-part .title-part {
 .popup .popup-buttons button {
     padding: 10px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease-in-out;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    min-width: 100px;
 }
 
 .popup .popup-buttons .confirm {
-    background-color: #28a745;
+    background-color: #27ae60;
     color: white;
 }
 
 .popup .popup-buttons .confirm:hover {
-    background-color: #218838;
+    background-color: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(39,174,96,0.3);
 }
 
 .popup .popup-buttons .cancel {
-    background-color: #dc3545;
+    background-color: #e74c3c;
     color: white;
 }
 
 .popup .popup-buttons .cancel:hover {
-    background-color: #c82333;
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231,76,60,0.3);
 }
 
+/* Animation de l'underline */
 .categories-choice {
     position: relative;
 }
 
-.categories-choice .div-button {
-    position: relative;
-    z-index: 1;
-}
-
-.categories-choice .underline {
-    position: absolute;
-    bottom: 0;
-    height: 3px;
-    width: 80px; /* largeur d’un bouton */
-    background-color: blue;
-    border-radius: 2px;
-    transition: transform 0.3s ease;
-}
-
-/* Déplacement dynamique via JS */
-.div-button.active ~ .underline {
+.categories-choice .div-button.active ~ .underline {
     transform: translateX(var(--underline-x, 0px));
 }
