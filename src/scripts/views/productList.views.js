@@ -1,28 +1,26 @@
 /**
  * ========================================
- * PRODUCT LIST VIEWS - AMÉLIORÉ
+ * PRODUCT LIST VIEWS - VERSION COMPLÈTE
  * ========================================
  * 
  * Liste des produits avec :
- * - Filtres avancés (multi-critères)
- * - Tri personnalisable
- * - Vue grille/liste
- * - Export PDF/Excel
- * - Statistiques en temps réel
+ * - Ajout de produit avec formulaire modal
+ * - Filtres avancés
+ * - Export PDF/Excel (sans duplication)
+ * - Gestion complète
  */
 
-import { fetchProducts, deleteMultipleProducts } from "../../data/product.js";
-import { render, renderSection } from "../utils/render.js";
+import { fetchProducts, deleteMultipleProducts, createProduct } from "../../data/product.js";
+import { renderSection } from "../utils/render.js";
 import { categorieList } from "../../data/categoriesList.js";
 import { fournisseursCards } from "../../data/Fournisseurs.js";
-import { form } from "../utils/renderForm.js";
 import { API_URL, getImageUrl, getUserRole } from "../../data/apiUrl.js";
 import { interactiveNavBar } from "./NavBar.views.js";
 import { exportToPDF, exportToExcel } from "../utils/export.js";
 
 // Cache et état
 let productsCache = [];
-let currentView = 'grid'; // 'grid' ou 'list'
+let currentView = 'grid';
 let currentSort = { field: 'name', order: 'asc' };
 let currentFilters = {
     category: '',
@@ -30,6 +28,9 @@ let currentFilters = {
     priceRange: { min: 0, max: Infinity },
     search: ''
 };
+
+// Flag pour éviter les événements dupliqués
+let eventsAttached = false;
 
 /**
  * Génère la vue principale de la liste des produits
@@ -44,15 +45,15 @@ export async function productList() {
 
         productsCache = products;
 
-        // Générer les options de catégories
+        // Générer les options
         const categoryOptions = categories
             .map(c => `<option value="${c.id}">${c.name}</option>`)
             .join('');
 
-        // Calculer les statistiques
+        // Calculer les stats
         const stats = calculateProductStats(products);
 
-        // Vérifier le rôle de l'utilisateur
+        // Vérifier le rôle
         const userRole = getUserRole();
         const isAdminOrMagasinier = userRole === 'ADMIN' || userRole === 'MAGASINIER';
 
@@ -61,25 +62,29 @@ export async function productList() {
             ${renderHeader(isAdminOrMagasinier, stats)}
             ${renderFilters(categoryOptions, stats)}
             ${renderProductGrid(products)}
+            ${isAdminOrMagasinier ? renderAddProductModal(categories) : ''}
         `;
+
+        // Réinitialiser les événements
+        eventsAttached = false;
 
         return renderSection("categorie-product-list-pannel", html);
 
     } catch (error) {
-        console.error('❌ Erreur lors du chargement des produits:', error);
+        console.error('❌ Erreur chargement produits:', error);
         return renderErrorState();
     }
 }
 
 /**
- * Calcule les statistiques des produits
+ * Calcule les statistiques
  */
 function calculateProductStats(products) {
     return {
         total: products.length,
-        lowStock: products.filter(p => p.quantity <= p.alertLevel).length,
+        lowStock: products.filter(p => p.quantity <= (p.alertLevel || 10)).length,
         outOfStock: products.filter(p => p.quantity === 0).length,
-        totalValue: products.reduce((sum, p) => sum + (p.price * p.quantity || 0), 0),
+        totalValue: products.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0),
         averagePrice: products.length > 0 
             ? products.reduce((sum, p) => sum + (p.price || 0), 0) / products.length 
             : 0
@@ -87,7 +92,7 @@ function calculateProductStats(products) {
 }
 
 /**
- * Rendu de l'en-tête avec statistiques
+ * Rendu header
  */
 function renderHeader(isAdminOrMagasinier, stats) {
     return `
@@ -98,15 +103,15 @@ function renderHeader(isAdminOrMagasinier, stats) {
                 <div class="header-actions">
                     ${isAdminOrMagasinier ? `
                         <div class="button-container">
-                            <button class="add-product button">
+                            <button class="add-product button" id="btn-add-product">
                                 <span class="btn-icon">➕</span>
                                 <span>Ajouter</span>
                             </button>
-                            <button class="delete-product button">
+                            <button class="delete-product button" id="btn-delete-product">
                                 <span class="btn-icon">🗑️</span>
                                 <span>Supprimer</span>
                             </button>
-                            <button class="real-delete" style="display:none;">
+                            <button class="real-delete" id="btn-confirm-delete" style="display:none;">
                                 ❗ Confirmer suppression
                             </button>
                         </div>
@@ -148,7 +153,7 @@ function renderHeader(isAdminOrMagasinier, stats) {
 }
 
 /**
- * Rendu des filtres avancés
+ * Rendu filtres
  */
 function renderFilters(categoryOptions, stats) {
     return `
@@ -182,17 +187,6 @@ function renderFilters(categoryOptions, stats) {
                 </div>
                 
                 <div class="filter-group">
-                    <label for="price-filter">Prix</label>
-                    <select id="price-filter" class="filter-select">
-                        <option value="">Tous</option>
-                        <option value="0-1000">0 - 1000 Ar</option>
-                        <option value="1000-5000">1000 - 5000 Ar</option>
-                        <option value="5000-10000">5000 - 10000 Ar</option>
-                        <option value="10000+">10000+ Ar</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
                     <label for="sort-filter">Trier par</label>
                     <select id="sort-filter" class="filter-select">
                         <option value="name-asc">Nom (A-Z)</option>
@@ -217,226 +211,232 @@ function renderFilters(categoryOptions, stats) {
                     ✖ Réinitialiser
                 </button>
             </div>
-            
-            <div class="active-filters" id="active-filters"></div>
         </div>
     `;
 }
 
 /**
- * Rendu de la grille de produits
+ * Rendu grille produits
  */
 function renderProductGrid(products) {
-    const filteredProducts = applyFilters(products);
-    const sortedProducts = applySorting(filteredProducts);
+    // Appliquer filtres
+    let filteredProducts = applyFilters(products);
     
-    if (sortedProducts.length === 0) {
-        return `
-            <div class="empty-state">
-                <div class="empty-icon">📦</div>
-                <h3>Aucun produit trouvé</h3>
-                <p>Essayez de modifier vos filtres de recherche</p>
-            </div>
-        `;
+    // Appliquer tri
+    filteredProducts = applySort(filteredProducts);
+
+    if (filteredProducts.length === 0) {
+        return `<div class="product-list-container empty"></div>`;
     }
 
-    const productCards = sortedProducts.map(p => 
-        currentView === 'grid' ? renderProductCard(p) : renderProductRow(p)
-    ).join('');
+    if (currentView === 'list') {
+        return renderListView(filteredProducts);
+    }
 
-    return `
-        <div class="product-list-container ${currentView}-view">
-            ${currentView === 'list' ? renderTableHeader() : ''}
-            ${productCards}
-        </div>
-    `;
-}
-
-/**
- * Rendu d'une carte de produit (vue grille)
- */
-function renderProductCard(product) {
-    const statusClass = getStatusClass(product);
-    const statusLabel = getStatusLabel(product);
-    const imageUrl = getImageUrl(product.imageUrl) || './src/images/placeholder.png';
-
-    return `
+    const cardsHTML = filteredProducts.map(product => `
         <div class="product-list-card" data-product-id="${product.id}">
-            <input 
-                type="checkbox" 
-                data-product-id="${product.id}" 
-                class="product-checkbox"
-                aria-label="Sélectionner ${product.name}"
-            />
-            
-            <div class="product-status-badge ${statusClass}">
-                ${statusLabel}
+            <input type="checkbox" class="product-checkbox" data-product-id="${product.id}">
+            <div class="product-status-badge status-${getProductStatus(product)}">
+                ${getStatusText(getProductStatus(product))}
             </div>
-            
             <div class="image-container">
-                <img 
-                    src="${imageUrl}" 
-                    alt="${product.name}"
-                    loading="lazy"
-                    onerror="this.src='./src/images/placeholder.png'"
-                />
+                <img src="${getImageUrl(product.imageUrl)}" alt="${product.name}">
                 <div class="image-overlay">
                     <button class="quick-view-btn" data-product-id="${product.id}">
-                        👁️ Voir détails
+                        👁️ Voir
                     </button>
                 </div>
             </div>
-            
             <div class="card-info">
-                <div class="product-name" title="${product.name}">
-                    ${product.name}
-                </div>
-                <div class="product-meta">
-                    <span class="category-tag">
-                        🏷️ ${product.category?.name || 'Sans catégorie'}
-                    </span>
-                </div>
+                <div class="product-name">${product.name}</div>
+                <div class="product-meta">${product.category?.name || 'Sans catégorie'}</div>
                 <div class="product-stats">
                     <div class="stat">
-                        <span class="label">Stock:</span>
-                        <span class="value ${product.quantity <= product.alertLevel ? 'low' : ''}"
-                            >${product.quantity || 0}</span>
+                        <span class="stat-label">Stock</span>
+                        <span class="stat-value ${product.quantity <= (product.alertLevel || 10) ? 'low' : ''}">${product.quantity || 0}</span>
                     </div>
                     <div class="stat">
-                        <span class="label">Prix:</span>
-                        <span class="value price">Ar ${formatNumber(product.price || 0)}</span>
+                        <span class="stat-label">Prix</span>
+                        <span class="stat-value price">Ar ${formatNumber(product.price || 0)}</span>
                     </div>
                 </div>
-                ${product.sku ? `
-                    <div class="product-sku">
-                        SKU: ${product.sku}
-                    </div>
-                ` : ''}
+                ${product.sku ? `<div class="product-sku">SKU: ${product.sku}</div>` : ''}
             </div>
         </div>
-    `;
+    `).join('');
+
+    return `<div class="product-list-container">${cardsHTML}</div>`;
 }
 
 /**
- * Rendu d'une ligne de produit (vue liste)
+ * Rendu vue liste
  */
-function renderProductRow(product) {
-    const statusClass = getStatusClass(product);
-    const statusLabel = getStatusLabel(product);
-    const imageUrl = getImageUrl(product.imageUrl) || './src/images/placeholder.png';
+function renderListView(products) {
+    const headerHTML = `
+        <div class="product-list-header">
+            <div>✓</div>
+            <div>Image</div>
+            <div>Nom</div>
+            <div>Catégorie</div>
+            <div>Stock</div>
+            <div>Prix</div>
+            <div>Statut</div>
+            <div>⚙️</div>
+        </div>
+    `;
 
-    return `
+    const rowsHTML = products.map(product => `
         <div class="product-list-row" data-product-id="${product.id}">
-            <div class="row-cell checkbox-cell">
-                <input 
-                    type="checkbox" 
-                    data-product-id="${product.id}" 
-                    class="product-checkbox"
-                />
+            <div class="checkbox-cell">
+                <input type="checkbox" class="product-checkbox" data-product-id="${product.id}">
             </div>
-            <div class="row-cell image-cell">
-                <img 
-                    src="${imageUrl}" 
-                    alt="${product.name}"
-                    loading="lazy"
-                    onerror="this.src='./src/images/placeholder.png'"
-                />
+            <div class="image-cell">
+                <img src="${getImageUrl(product.imageUrl)}" alt="${product.name}">
             </div>
-            <div class="row-cell name-cell">
+            <div class="name-cell">
                 <div class="product-name">${product.name}</div>
                 ${product.sku ? `<div class="product-sku">SKU: ${product.sku}</div>` : ''}
             </div>
-            <div class="row-cell category-cell">
-                ${product.category?.name || '-'}
-            </div>
-            <div class="row-cell quantity-cell">
-                <span class="${product.quantity <= product.alertLevel ? 'low' : ''}">
-                    ${product.quantity || 0}
+            <div class="category-cell">${product.category?.name || '-'}</div>
+            <div class="quantity-cell ${product.quantity <= (product.alertLevel || 10) ? 'low' : ''}">${product.quantity || 0}</div>
+            <div class="price-cell">Ar ${formatNumber(product.price || 0)}</div>
+            <div class="status-cell">
+                <span class="status-badge status-${getProductStatus(product)}">
+                    ${getStatusText(getProductStatus(product))}
                 </span>
             </div>
-            <div class="row-cell price-cell">
-                Ar ${formatNumber(product.price || 0)}
-            </div>
-            <div class="row-cell status-cell">
-                <span class="status-badge ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="row-cell actions-cell">
-                <button class="action-btn view-btn" data-product-id="${product.id}">
-                    👁️
-                </button>
+            <div class="action-cell">
+                <button class="action-btn" data-product-id="${product.id}">👁️</button>
             </div>
         </div>
-    `;
+    `).join('');
+
+    return `<div class="product-list-container list-view">${headerHTML}${rowsHTML}</div>`;
 }
 
 /**
- * Rendu de l'en-tête du tableau (vue liste)
+ * Modal d'ajout de produit
  */
-function renderTableHeader() {
+function renderAddProductModal(categories) {
+    const categoryOptions = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    
     return `
-        <div class="product-list-header">
-            <div class="header-cell checkbox-cell">
-                <input type="checkbox" id="select-all-products" />
+        <div class="modal-overlay" id="add-product-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>➕ Ajouter un Produit</h2>
+                    <button class="modal-close" id="close-add-modal">&times;</button>
+                </div>
+                <form id="add-product-form" class="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-name">Nom du produit *</label>
+                            <input type="text" id="product-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-sku">SKU</label>
+                            <input type="text" id="product-sku" name="sku">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-category">Catégorie</label>
+                            <select id="product-category" name="categoryId">
+                                <option value="">Sans catégorie</option>
+                                ${categoryOptions}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-location">Emplacement</label>
+                            <input type="text" id="product-location" name="location">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-quantity">Quantité *</label>
+                            <input type="number" id="product-quantity" name="quantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Prix (Ar) *</label>
+                            <input type="number" id="product-price" name="price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-alert">Niveau d'alerte</label>
+                            <input type="number" id="product-alert" name="alertLevel" min="0" value="10">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="product-image">Image</label>
+                        <input type="file" id="product-image" name="imageUrl" accept="image/*">
+                        <div class="image-preview" id="image-preview"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancel-add-product">Annuler</button>
+                        <button type="submit" class="btn-submit">✓ Ajouter le Produit</button>
+                    </div>
+                </form>
             </div>
-            <div class="header-cell image-cell">Image</div>
-            <div class="header-cell name-cell">Nom</div>
-            <div class="header-cell category-cell">Catégorie</div>
-            <div class="header-cell quantity-cell">Stock</div>
-            <div class="header-cell price-cell">Prix</div>
-            <div class="header-cell status-cell">Statut</div>
-            <div class="header-cell actions-cell">Actions</div>
         </div>
     `;
 }
 
-/**
- * Applique les filtres aux produits
- */
+// ========================================
+// FILTRAGE ET TRI
+// ========================================
+
 function applyFilters(products) {
     return products.filter(p => {
-        // Filtre de recherche
+        // Filtre recherche
         if (currentFilters.search) {
-            const searchLower = currentFilters.search.toLowerCase();
-            const matchName = p.name.toLowerCase().includes(searchLower);
-            const matchCategory = p.category?.name?.toLowerCase().includes(searchLower);
-            const matchSKU = p.sku?.toLowerCase().includes(searchLower);
-            if (!matchName && !matchCategory && !matchSKU) return false;
+            const term = currentFilters.search.toLowerCase();
+            const matches = 
+                p.name.toLowerCase().includes(term) ||
+                p.sku?.toLowerCase().includes(term) ||
+                p.category?.name?.toLowerCase().includes(term);
+            if (!matches) return false;
         }
 
-        // Filtre de catégorie
+        // Filtre catégorie
         if (currentFilters.category) {
-            const catId = Number(currentFilters.category);
-            if (p.categoryId !== catId && p.category?.id !== catId) return false;
+            if (p.categoryId != currentFilters.category) return false;
         }
 
-        // Filtre de statut
+        // Filtre statut
         if (currentFilters.status) {
-            const status = getProductStatus(p);
-            if (status !== currentFilters.status) return false;
+            if (getProductStatus(p) !== currentFilters.status) return false;
         }
 
-        // Filtre de prix
+        // Filtre prix
         const price = p.price || 0;
-        const range = currentFilters.priceRange;
-        if (price < range.min || price > range.max) return false;
+        if (price < currentFilters.priceRange.min || price > currentFilters.priceRange.max) {
+            return false;
+        }
 
         return true;
     });
 }
 
-/**
- * Applique le tri aux produits
- */
-function applySorting(products) {
-    const { field, order } = currentSort;
-    
-    return [...products].sort((a, b) => {
+function applySort(products) {
+    return products.sort((a, b) => {
+        const { field, order } = currentSort;
         let aVal, bVal;
 
         switch (field) {
             case 'name':
-                aVal = a.name?.toLowerCase() || '';
-                bVal = b.name?.toLowerCase() || '';
+                aVal = a.name.toLowerCase();
+                bVal = b.name.toLowerCase();
                 break;
             case 'price':
                 aVal = a.price || 0;
@@ -456,90 +456,73 @@ function applySorting(products) {
     });
 }
 
-/**
- * Détermine le statut d'un produit
- */
-function getProductStatus(product) {
-    if (product.quantity === 0) return 'out';
-    if (product.quantity <= product.alertLevel) return 'low';
-    return 'available';
-}
+// ========================================
+// GESTION DES ÉVÉNEMENTS
+// ========================================
 
-/**
- * Retourne la classe CSS du statut
- */
-function getStatusClass(product) {
-    const status = getProductStatus(product);
-    return {
-        'out': 'status-out',
-        'low': 'status-low',
-        'available': 'status-available'
-    }[status];
-}
-
-/**
- * Retourne le label du statut
- */
-function getStatusLabel(product) {
-    const status = getProductStatus(product);
-    return {
-        'out': 'Épuisé',
-        'low': 'Stock faible',
-        'available': 'Disponible'
-    }[status];
-}
-
-/**
- * Formate un nombre
- */
-function formatNumber(num) {
-    return new Intl.NumberFormat('fr-FR').format(num);
-}
-
-/**
- * État d'erreur
- */
-function renderErrorState() {
-    return `
-        <div class="error-state">
-            <div class="error-icon">⚠️</div>
-            <h3>Erreur de chargement</h3>
-            <p>Impossible de charger les produits</p>
-            <button onclick="location.reload()">Réessayer</button>
-        </div>
-    `;
-}
-
-/**
- * Rafraîchit la liste des produits
- */
 async function refreshProductList() {
     productsCache = await fetchProducts();
     const container = document.querySelector(".product-list-container");
     if (container) {
         container.outerHTML = renderProductGrid(productsCache);
+        attachCardEvents();
     }
-    attachAllEvents();
 }
 
-/**
- * Attache tous les événements
- */
 function attachAllEvents() {
+    if (eventsAttached) {
+        console.log('⚠️ Événements déjà attachés, skip');
+        return;
+    }
+
     activateProductSearch();
     activateProductFilter();
     activateProductSort();
     activateViewToggle();
     activateClearFilters();
-    activateProductCardEvent();
+    attachCardEvents();
     activateAjouterProductButton();
     activateProductDeleteButton();
     activateExportButtons();
-    activateSelectAll();
     interactiveNavBar();
+
+    eventsAttached = true;
+    console.log('✅ Événements attachés');
 }
 
-// Fonctions d'activation (à implémenter selon vos besoins)
+function attachCardEvents() {
+    document.querySelectorAll('.product-list-card, .product-list-row').forEach(el => {
+        // Retirer les anciens événements
+        const newEl = el.cloneNode(true);
+        el.replaceWith(newEl);
+        
+        newEl.addEventListener('click', (e) => {
+            if (e.target.closest('.product-checkbox') || e.target.closest('.action-btn')) return;
+            const productId = newEl.dataset.productId;
+            if (productId) {
+                window.location.hash = `#/productList/Pannel?id=${productId}`;
+            }
+        });
+    });
+
+    document.querySelectorAll('.quick-view-btn, .action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const productId = btn.dataset.productId;
+            if (productId) {
+                window.location.hash = `#/productList/Pannel?id=${productId}`;
+            }
+        });
+    });
+
+    // Checkboxes
+    document.querySelectorAll('.product-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            e.stopPropagation();
+        });
+    });
+}
+
 function activateProductSearch() {
     const searchInput = document.getElementById('product-search');
     if (searchInput) {
@@ -558,25 +541,11 @@ function activateProductFilter() {
             refreshProductList();
         });
     }
+
     const statusFilter = document.getElementById('status-filter');
     if (statusFilter) {
         statusFilter.addEventListener('change', (e) => {
             currentFilters.status = e.target.value;
-            refreshProductList();
-        });
-    }
-    const priceFilter = document.getElementById('price-filter');
-    if (priceFilter) {
-        priceFilter.addEventListener('change', (e) => {
-            const value = e.target.value;
-            if (value === '') {
-                currentFilters.priceRange = { min: 0, max: Infinity };
-            } else if (value === '10000+') {
-                currentFilters.priceRange = { min: 10000, max: Infinity };
-            } else {
-                const [min, max] = value.split('-').map(Number);
-                currentFilters.priceRange = { min, max };
-            }
             refreshProductList();
         });
     }
@@ -598,6 +567,8 @@ function activateViewToggle() {
     viewBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             currentView = btn.dataset.view;
+            viewBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             refreshProductList();
         });
     });
@@ -612,72 +583,133 @@ function activateClearFilters() {
             document.getElementById('product-search').value = '';
             document.getElementById('category-filter').value = '';
             document.getElementById('status-filter').value = '';
-            document.getElementById('price-filter').value = '';
             document.getElementById('sort-filter').value = 'name-asc';
             refreshProductList();
         });
     }
 }
 
-function activateProductCardEvent() {
-    document.querySelectorAll('.product-list-card, .product-list-row').forEach(el => {
-        el.addEventListener('click', (e) => {
-            if (e.target.closest('.product-checkbox') || e.target.closest('.action-btn')) return;
-            const productId = el.dataset.productId;
-            if (productId) {
-                window.location.hash = `#/productList/Pannel?id=${productId}`;
-            }
-        });
-    });
-    document.querySelectorAll('.quick-view-btn, .view-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const productId = btn.dataset.productId;
-            if (productId) {
-                window.location.hash = `#/productList/Pannel?id=${productId}`;
-            }
-        });
-    });
-}
-
 function activateAjouterProductButton() {
-    const addBtn = document.querySelector('.add-product');
-    if (addBtn) {
-        addBtn.addEventListener('click', () => {
-            // À implémenter : formulaire d'ajout de produit
-            alert('Fonctionnalité d\'ajout de produit à implémenter');
-        });
-    }
+    const addBtn = document.getElementById('btn-add-product');
+    const modal = document.getElementById('add-product-modal');
+    const closeBtn = document.getElementById('close-add-modal');
+    const cancelBtn = document.getElementById('cancel-add-product');
+    const form = document.getElementById('add-product-form');
+    const imageInput = document.getElementById('product-image');
+    const imagePreview = document.getElementById('image-preview');
+
+    if (!addBtn || !modal) return;
+
+    // Ouvrir modal
+    addBtn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+
+    // Fermer modal
+    const closeModal = () => {
+        modal.style.display = 'none';
+        form.reset();
+        imagePreview.innerHTML = '';
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Preview image
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Soumettre formulaire
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('product-name').value);
+        formData.append('quantity', document.getElementById('product-quantity').value);
+        formData.append('price', document.getElementById('product-price').value);
+
+        const sku = document.getElementById('product-sku').value;
+        if (sku) formData.append('sku', sku);
+
+        const categoryId = document.getElementById('product-category').value;
+        if (categoryId) formData.append('categoryId', categoryId);
+
+        const location = document.getElementById('product-location').value;
+        if (location) formData.append('location', location);
+
+        const alertLevel = document.getElementById('product-alert').value;
+        if (alertLevel) formData.append('alertLevel', alertLevel);
+
+        const description = document.getElementById('product-description').value;
+        if (description) formData.append('description', description);
+
+        if (imageInput.files[0]) {
+            formData.append('imageUrl', imageInput.files[0]);
+        }
+
+        try {
+            const result = await createProduct(formData);
+            if (result) {
+                closeModal();
+                await refreshProductList();
+            }
+        } catch (error) {
+            alert('Erreur lors de l\'ajout du produit');
+        }
+    });
 }
 
 function activateProductDeleteButton() {
-    const deleteBtn = document.querySelector('.delete-product');
-    const realDeleteBtn = document.querySelector('.real-delete');
-    if (deleteBtn && realDeleteBtn) {
-        deleteBtn.addEventListener('click', () => {
-            realDeleteBtn.style.display = 'inline-block';
-        });
-        realDeleteBtn.addEventListener('click', async () => {
-            const checkboxes = document.querySelectorAll('.product-checkbox:checked');
-            const ids = Array.from(checkboxes).map(cb => cb.dataset.productId);
-            if (ids.length === 0) {
-                alert('Sélectionnez au moins un produit');
-                return;
-            }
-            if (confirm(`Supprimer ${ids.length} produit(s) ?`)) {
-                const result = await deleteMultipleProducts(ids);
-                console.log(result);
-                refreshProductList();
-                realDeleteBtn.style.display = 'none';
-            }
-        });
-    }
+    const deleteBtn = document.getElementById('btn-delete-product');
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+
+    if (!deleteBtn || !confirmBtn) return;
+
+    deleteBtn.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        checkboxes.forEach(cb => cb.classList.add('visible'));
+        confirmBtn.style.display = 'inline-block';
+    });
+
+    confirmBtn.addEventListener('click', async () => {
+        const checked = document.querySelectorAll('.product-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.dataset.productId);
+        
+        if (ids.length === 0) {
+            alert('Sélectionnez au moins un produit');
+            return;
+        }
+
+        if (!confirm(`Supprimer ${ids.length} produit(s) ?`)) return;
+
+        const result = await deleteMultipleProducts(ids);
+        console.log(`✅ ${result.success.length} supprimé(s)`);
+        
+        await refreshProductList();
+        confirmBtn.style.display = 'none';
+        document.querySelectorAll('.product-checkbox').forEach(cb => cb.classList.remove('visible'));
+    });
 }
 
 function activateExportButtons() {
     const pdfBtn = document.getElementById('export-products-pdf');
+    const excelBtn = document.getElementById('export-products-excel');
+
     if (pdfBtn) {
-        pdfBtn.addEventListener('click', () => {
+        // Retirer les anciens événements
+        const newPdfBtn = pdfBtn.cloneNode(true);
+        pdfBtn.replaceWith(newPdfBtn);
+
+        newPdfBtn.addEventListener('click', () => {
+            console.log('📄 Export PDF...');
             exportToPDF({
                 title: 'Liste des Produits',
                 data: productsCache.map(p => ({
@@ -688,11 +720,16 @@ function activateExportButtons() {
                 })),
                 filename: 'produits.pdf'
             });
-        });
+        }, { once: true });
     }
-    const excelBtn = document.getElementById('export-products-excel');
+
     if (excelBtn) {
-        excelBtn.addEventListener('click', () => {
+        // Retirer les anciens événements
+        const newExcelBtn = excelBtn.cloneNode(true);
+        excelBtn.replaceWith(newExcelBtn);
+
+        newExcelBtn.addEventListener('click', () => {
+            console.log('📊 Export Excel...');
             const csvData = productsCache.map(p => ({
                 Nom: p.name,
                 Catégorie: p.category?.name || '-',
@@ -700,32 +737,57 @@ function activateExportButtons() {
                 Prix: p.price
             }));
             exportToExcel(csvData, 'produits.csv');
-        });
+        }, { once: true });
     }
 }
 
-function activateSelectAll() {
-    const selectAll = document.getElementById('select-all-products');
-    if (selectAll) {
-        selectAll.addEventListener('change', (e) => {
-            document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = e.target.checked);
-        });
-    }
+// ========================================
+// UTILITAIRES
+// ========================================
+
+function getProductStatus(product) {
+    const qty = product.quantity || 0;
+    const alert = product.alertLevel || 10;
+    if (qty === 0) return 'out';
+    if (qty <= alert) return 'low';
+    return 'available';
+}
+
+function getStatusText(status) {
+    const texts = {
+        'out': 'Épuisé',
+        'low': 'Stock faible',
+        'available': 'Disponible'
+    };
+    return texts[status] || status;
+}
+
+function formatNumber(num) {
+    return new Intl.NumberFormat('fr-FR').format(num);
+}
+
+function renderErrorState() {
+    return `
+        <div class="error-state">
+            <h2>❌ Erreur de chargement</h2>
+            <p>Impossible de charger les produits</p>
+            <button onclick="location.reload()">Réessayer</button>
+        </div>
+    `;
 }
 
 // Export
 export { 
     productList as default,
     refreshProductList,
+    attachAllEvents as activateProductListEvents,
     activateProductSearch,
     activateProductFilter,
     activateProductSort,
     activateViewToggle,
     activateClearFilters,
-    activateProductCardEvent,
+    attachCardEvents as activateProductCardEvent,
     activateAjouterProductButton,
-    activateProductDeleteButton,  
-    activateExportButtons,
-    activateSelectAll,
-    attachAllEvents as activateProductListEvents
+    activateProductDeleteButton,
+    activateExportButtons
 };

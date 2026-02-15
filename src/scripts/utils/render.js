@@ -1,48 +1,67 @@
+/**
+ * ========================================
+ * RENDER.JS - AVEC WAIT STATE
+ * ========================================
+ * 
+ * Affiche un loader pendant la navigation
+ */
 
 import { views } from "../route/route.js";
 import { activateCategorieButton, activateCategoryCard } from "../views/categories.views.js";
 import { activateFournisseursButton, addFournisseur } from "../views/fournisseurs.views.js";
 import { addUsers, activeDeleteButton, filter, modifyButton } from "../views/gestionUtilisateur.views.js";
 import { interactiveNavBar } from "../views/NavBar.views.js";
-import { 
-    activateAjouterProductButton, 
-    activateProductFilter, 
-    activateProductDeleteButton, 
-    activateProductSearch, 
-    activateProductCardEvent, 
-    activateProductListEvents 
-} from "../views/productList.views.js";
+import { activateProductListEvents } from "../views/productList.views.js";
 import { previousButton, modifierButton, SupprimerButton } from "./renderFournisseur.js";
 import { modifierProductButton, SupprimerProductButton, previousProductButton } from "./renderProducInfo.js";
 
-// État du routeur pour éviter les rechargements
+// État du routeur
 let currentRoute = '';
 let isRendering = false;
+
+/**
+ * Affiche un loader pendant le chargement
+ */
+function showLoadingState(main) {
+    main.innerHTML = `
+        <div class="wait-screen">
+            <div class="loader-container">
+                <div class="loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <div class="loading-text">Chargement...</div>
+            </div>
+        </div>
+    `;
+}
 
 /**
  * Rend une route dans le main
  */
 export async function render(route, id = 0) {
-    // Éviter les rechargements de la même route
+    // Éviter les rechargements
     const fullRoute = id ? `${route}?id=${id}` : route;
     if (currentRoute === fullRoute && !isRendering) {
         console.log('🔄 Route déjà chargée:', fullRoute);
         return;
     }
 
-    // Empêcher les rendus concurrents
+    // Empêcher rendus concurrents
     if (isRendering) {
-        console.log('⏳ Rendu en cours, annulation...');
+        console.log('⏳ Rendu en cours, skip...');
         return;
     }
 
     isRendering = true;
     currentRoute = fullRoute;
 
-    // Vérifier le token
+    // Vérifier token
     const token = localStorage.getItem("token");
     if (!token) {
-        window.location.href = "#/login";
+        window.location.href = "/index.html";
         isRendering = false;
         return;
     }
@@ -51,16 +70,23 @@ export async function render(route, id = 0) {
     try {
         payload = JSON.parse(atob(token.split(".")[1]));
     } catch (err) {
-        console.error("❌ Token invalide :", err);
+        console.error("❌ Token invalide");
         localStorage.removeItem("token");
-        window.location.href = "#/login";
+        window.location.href = "/index.html";
         isRendering = false;
         return;
     }
 
     const main = document.getElementById("main");
-    const view = views[route];
+    if (!main) {
+        isRendering = false;
+        return;
+    }
 
+    // Afficher le loader
+    showLoadingState(main);
+
+    const view = views[route];
     if (!view) {
         main.innerHTML = `
             <div class="error-404">
@@ -74,19 +100,17 @@ export async function render(route, id = 0) {
     }
 
     try {
-        // Routes ADMIN et MAGASINIER
+        // Routes selon rôle
         if (payload.role === "ADMIN" || payload.role === "MAGASINIER") {
             await renderAdminRoute(route, id, view, main);
-        } 
-        // Routes EMPLOYE
-        else if (payload.role === "EMPLOYE") {
+        } else if (payload.role === "EMPLOYE") {
             await renderEmployeRoute(route, id, view, main);
         }
     } catch (error) {
-        console.error("❌ Erreur lors du rendu:", error);
+        console.error("❌ Erreur rendu:", error);
         main.innerHTML = `
             <div class="error-state">
-                <h2>Erreur de chargement</h2>
+                <h2>❌ Erreur de chargement</h2>
                 <p>${error.message}</p>
                 <button onclick="location.reload()">Recharger</button>
             </div>
@@ -97,7 +121,7 @@ export async function render(route, id = 0) {
 }
 
 /**
- * Rend les routes pour ADMIN/MAGASINIER
+ * Routes ADMIN/MAGASINIER
  */
 async function renderAdminRoute(route, id, view, main) {
     switch (route) {
@@ -132,7 +156,6 @@ async function renderAdminRoute(route, id, view, main) {
 
         case "#/productList":
             main.innerHTML = await view();
-            // Attacher tous les événements des produits
             setTimeout(() => {
                 activateProductListEvents();
             }, 100);
@@ -162,7 +185,7 @@ async function renderAdminRoute(route, id, view, main) {
 }
 
 /**
- * Rend les routes pour EMPLOYE
+ * Routes EMPLOYE
  */
 async function renderEmployeRoute(route, id, view, main) {
     switch (route) {
@@ -197,7 +220,7 @@ function getIdFromHash(hash) {
 export function initRouter() {
     const token = localStorage.getItem("token");
     if (!token) {
-        window.location.href = "#/login";
+        window.location.href = "/index.html";
         return;
     }
 
@@ -205,47 +228,43 @@ export function initRouter() {
     try {
         payload = JSON.parse(atob(token.split(".")[1]));
     } catch (err) {
-        console.error("❌ Token invalide :", err);
+        console.error("❌ Token invalide");
         localStorage.removeItem("token");
-        window.location.href = "#/login";
+        window.location.href = "/index.html";
         return;
     }
 
-    /**
-     * Charge une route
-     */
     async function loadRoute() {
         let hash = window.location.hash;
 
-        // Route par défaut selon le rôle
+        // Route par défaut
         if (!hash || hash === '#/') {
             hash = payload.role === "ADMIN" || payload.role === "MAGASINIER" 
                 ? "#/dashboard" 
                 : "#/simpleUser";
             window.location.hash = hash;
-            return; // Le hashchange va déclencher le chargement
+            return;
         }
 
-        // Extraire la route et l'ID
+        // Extraire route et ID
         const routePart = hash.split('?')[0];
         const id = getIdFromHash(hash);
 
         console.log('📍 Navigation vers:', routePart, id ? `(ID: ${id})` : '');
 
-        // Rendre la route
+        // Rendre
         await render(routePart, id);
     }
 
-    // Initialiser la navbar
+    // Init navbar
     interactiveNavBar();
 
-    // Écouter les changements de route
+    // Écouter changements
     window.addEventListener("hashchange", loadRoute);
 
-    // Charger la route initiale
+    // Charger route initiale
     loadRoute();
 }
-
 
 export function renderSection(className = "", htmlElement = "") {
     return `
