@@ -36,6 +36,7 @@ a {
 body {
     background-color: #f8fafc;   /* Fond très clair */
     min-height: 100vh;
+    width: 100%;
     overflow-x: hidden;
     color: #1e293b;               /* Texte sombre pour contraste */
 }
@@ -44,11 +45,41 @@ body {
    CONTAINER PRINCIPAL
    ======================================== */
 main {
-    margin-left: 250px;  /* Espace pour la nav */
+    margin-left: 250px;
     margin-top: 60px;
     padding: 25px;
     min-height: calc(100vh - 60px);
     transition: margin-left 0.3s ease;
+}
+
+/* ========================================
+   NAVIGATION SIDEBAR
+   ======================================== */
+nav {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 60px);
+    background: #ffffff;           /* Fond blanc */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+    z-index: 999;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+}
+
+/* Scrollbar de la nav */
+nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+nav::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+nav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
 }
 
 /* ========================================
@@ -337,7 +368,7 @@ tr:hover {
     }
 
     main {
-        margin-left: 100px;  /* Ajusté pour correspondre à la nav condensée */
+        margin-left: 100px;
     }
 }
 
