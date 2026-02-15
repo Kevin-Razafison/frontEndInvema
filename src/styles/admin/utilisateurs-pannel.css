@@ -6,6 +6,7 @@ main .utilisateur-pannel-container {
     width: 100%;
     min-height: calc(100vh - 120px);
     padding-bottom: 50px;
+    padding-top: 100px; /* Espace pour la barre fixe */
 }
 
 /* ========================================
@@ -21,7 +22,7 @@ main .utilisateur-pannel-container .pannel-title {
 }
 
 /* ========================================
-   BARRE D'ACTIONS (Ajouter utilisateur)
+   BARRE D'ACTIONS (Ajouter utilisateur + Filtres)
    ======================================== */
 
 main .utilisateur-pannel-container .ajouter-utilisateurs {
@@ -40,13 +41,8 @@ main .utilisateur-pannel-container .ajouter-utilisateurs {
     gap: 20px;
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs .actions-left {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-main .utilisateur-pannel-container .ajouter-utilisateurs button {
+/* Le premier bouton "Ajouter utilisateur" */
+main .utilisateur-pannel-container .ajouter-utilisateurs > button {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -62,62 +58,54 @@ main .utilisateur-pannel-container .ajouter-utilisateurs button {
     gap: 8px;
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs button:hover {
+main .utilisateur-pannel-container .ajouter-utilisateurs > button:hover {
     background-color: #229954;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs button:active {
+main .utilisateur-pannel-container .ajouter-utilisateurs > button:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
 }
 
-main .utilisateur-pannel-container .ajouter-utilisateurs button::before {
+main .utilisateur-pannel-container .ajouter-utilisateurs > button::before {
     content: '+';
     font-size: 20px;
     font-weight: bold;
 }
 
 /* ========================================
-   FILTRES
+   FILTRES (à l'intérieur de la barre fixe)
    ======================================== */
 
-main .filter-container {
-    margin-top: 130px;
-    margin-bottom: 25px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-main .filter-container .filter-button-container {
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container {
     display: flex;
     gap: 10px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.1);
     padding: 8px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-main .filter-container .filter-button-container .filter {
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter {
     padding: 10px 20px;
-    border: 2px solid #e0e0e0;
-    background-color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: #5a6c7d;
+    color: rgba(255, 255, 255, 0.8);
     transition: all 0.2s ease;
 }
 
-main .filter-container .filter-button-container .filter:hover {
-    background-color: #f8f9fa;
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter:hover {
+    background-color: rgba(255, 255, 255, 0.15);
     border-color: #3498db;
+    color: white;
 }
 
-main .filter-container .filter-button-container .is-filter-active {
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .is-filter-active {
     background-color: #3498db;
     color: white;
     border-color: #3498db;
@@ -349,8 +337,8 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .actio
         gap: 15px;
     }
 
-    main .filter-container {
-        margin-top: 160px;
+    main .utilisateur-pannel-container {
+        padding-top: 140px; /* Plus d'espace en mobile car la barre est plus haute */
     }
 
     main .utilisateur-pannel-container .list-users-containers .list-users-title {
