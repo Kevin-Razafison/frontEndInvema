@@ -497,12 +497,6 @@ export function attachOrderEvents() {
         });
     });
 
-    // Bouton nouvelle commande
-    document.getElementById('create-order-btn')?.addEventListener('click', () => {
-        // Implémenter l'ouverture d'un modal de création
-        console.log('Créer une commande');
-    });
-
     // Boutons d'action sur chaque ligne
     document.querySelectorAll('.view-order').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -514,6 +508,91 @@ export function attachOrderEvents() {
     // Historique
     document.getElementById('historique-btn')?.addEventListener('click', () => {
         console.log('Afficher historique');
+    });
+
+    document.getElementById('create-order-btn')?.addEventListener('click', openCreateOrderModal);
+}
+
+/**
+ * Ouvre un modal de création de commande
+ */
+function openCreateOrderModal() {
+    // Créer l'overlay et le formulaire
+    const modalHTML = `
+        <div class="popup-container" id="create-order-modal">
+            <div class="popup">
+                <h3>➕ Nouvelle commande</h3>
+                <div class="form-group">
+                    <label>Fournisseur</label>
+                    <select id="order-supplier" required>
+                        <option value="">Sélectionner un fournisseur</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Produit</label>
+                    <select id="order-product" required>
+                        <option value="">Sélectionner un produit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantité</label>
+                    <input type="number" id="order-quantity" min="1" value="1" required>
+                </div>
+                <div class="popup-buttons">
+                    <button class="cancel" id="cancel-order">Annuler</button>
+                    <button class="confirm" id="confirm-order">Créer</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Charger dynamiquement les fournisseurs et produits
+    loadSuppliersAndProducts();
+
+    // Fermeture
+    document.getElementById('cancel-order').addEventListener('click', () => {
+        document.getElementById('create-order-modal').remove();
+    });
+    document.getElementById('confirm-order').addEventListener('click', async () => {
+        const supplierId = document.getElementById('order-supplier').value;
+        const productId = document.getElementById('order-product').value;
+        const quantity = document.getElementById('order-quantity').value;
+        if (!supplierId || !productId || !quantity) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+        // Appel API pour créer la commande
+        const result = await createOrder({
+            supplierId,
+            items: [{ id: productId, quantity }]
+        });
+        if (result) {
+            document.getElementById('create-order-modal').remove();
+            // Recharger la vue des commandes
+            const main = document.getElementById('main');
+            main.innerHTML = await CommandePannel();
+            attachOrderEvents();
+        }
+    });
+}
+
+async function loadSuppliersAndProducts() {
+    // Importer les fonctions nécessaires
+    const { fournisseursCards } = await import('../../data/Fournisseurs.js');
+    const { fetchProducts } = await import('../../data/product.js');
+    
+    const suppliers = await fournisseursCards();
+    const products = await fetchProducts();
+
+    const supplierSelect = document.getElementById('order-supplier');
+    const productSelect = document.getElementById('order-product');
+
+    suppliers.forEach(sup => {
+        supplierSelect.innerHTML += `<option value="${sup.id}">${sup.name}</option>`;
+    });
+    products.forEach(prod => {
+        productSelect.innerHTML += `<option value="${prod.id}">${prod.name} (Stock: ${prod.quantity})</option>`;
     });
 }
 
