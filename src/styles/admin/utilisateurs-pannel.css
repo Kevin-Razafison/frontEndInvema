@@ -136,10 +136,10 @@ main .utilisateur-pannel-container .list-users-containers {
     overflow: hidden;
 }
 
-/* En-tête de la liste */
+/* En-tête de la liste - CORRIGÉ: 4 colonnes alignées avec le JS */
 main .utilisateur-pannel-container .list-users-containers .list-users-title {
     display: grid;
-    grid-template-columns: 2fr 2fr 2fr 1.5fr;
+    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
     gap: 20px;
     padding: 20px 30px;
     background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
@@ -157,7 +157,7 @@ main .utilisateur-pannel-container .list-users-containers .list-users-title {
 
 main .utilisateur-pannel-container .list-users-containers .list-users-row {
     display: grid;
-    grid-template-columns: 2fr 2fr 2fr 1.5fr;
+    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
     gap: 20px;
     padding: 20px 30px;
     background-color: white;
@@ -175,34 +175,18 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row:last-c
     border-bottom: none;
 }
 
+/* Colonne USER ID */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-id-column {
+    font-weight: 600;
+    font-size: 15px;
+    color: #7f8c8d;
+}
+
 /* Colonne du nom */
 main .utilisateur-pannel-container .list-users-containers .list-users-row .user-name-column {
-    display: flex;
-    align-items: center;
-    gap: 15px;
     font-weight: 600;
     font-size: 15px;
     color: #2c3e50;
-}
-
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-name-column .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-/* Colonne de l'email */
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-email-column {
-    color: #5a6c7d;
-    font-size: 14px;
 }
 
 /* Colonne du type de permission */
@@ -212,7 +196,7 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .user-
     gap: 12px;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .permission-badge {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column > div {
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
@@ -221,19 +205,20 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .user-
     letter-spacing: 0.5px;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .permission-badge.admin {
+/* Styles par rôle */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-admin {
     background-color: #e8f4fd;
     color: #3498db;
     border: 2px solid #3498db;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .permission-badge.user {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-employe {
     background-color: #d4edda;
     color: #27ae60;
     border: 2px solid #27ae60;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .permission-badge.guest {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-magasinier {
     background-color: #fff3cd;
     color: #f39c12;
     border: 2px solid #f39c12;
@@ -266,7 +251,8 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .actio
     justify-content: flex-end;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
     width: 36px;
     height: 36px;
     border-radius: 8px;
@@ -279,32 +265,35 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .actio
     background-color: transparent;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button:hover {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
     transform: scale(1.1);
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button.edit {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
     background-color: #e8f4fd;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button.edit:hover {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
     background-color: #d1ecf1;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button.delete {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button {
     background-color: #fee;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button.delete:hover {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover {
     background-color: #fdd;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button img {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button img,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user img {
     width: 20px;
     height: 20px;
 }
 
-main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .action-button:active {
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:active,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:active {
     transform: scale(0.95);
 }
 
@@ -348,7 +337,7 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .actio
 @media (max-width: 1024px) {
     main .utilisateur-pannel-container .list-users-containers .list-users-title,
     main .utilisateur-pannel-container .list-users-containers .list-users-row {
-        grid-template-columns: 1.5fr 1.5fr 1fr 1fr;
+        grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr;
         gap: 15px;
         padding: 15px 20px;
     }
