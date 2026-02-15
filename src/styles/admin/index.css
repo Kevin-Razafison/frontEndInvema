@@ -45,7 +45,7 @@ body {
    CONTAINER PRINCIPAL
    ======================================== */
 main {
-    margin-left: 0px;
+    margin-left: 250px;  /* Aligné avec la largeur de la nav */
     margin-top: 60px;
     padding: 25px;
     min-height: calc(100vh - 60px);
@@ -370,6 +370,7 @@ tr:hover {
     }
 
     main {
+        margin-left: 100px;  /* Ajusté pour correspondre à la nav condensée */
         width: calc(100% - 100px);
     }
 }
