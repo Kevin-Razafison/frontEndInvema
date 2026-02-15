@@ -3,8 +3,6 @@
    ======================================== */
 
 main .utilisateur-pannel-container {
-    width: 100%;
-    max-width: 100%;
     min-height: calc(100vh - 120px);
     padding-bottom: 50px;
     padding-top: 100px; /* Espace pour la barre fixe */
@@ -117,7 +115,6 @@ main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-containe
    ======================================== */
 
 main .utilisateur-pannel-container .list-users-containers {
-    width: 100%;
     max-width: 1400px;
     background-color: white;
     border-radius: 16px;
@@ -319,7 +316,7 @@ main .utilisateur-pannel-container .list-users-containers .list-users-row .actio
 
 @media (max-width: 1306px) {
     main .utilisateur-pannel-container .ajouter-utilisateurs {
-        left: 100px;
+        left: 80px;
     }
 }
 
