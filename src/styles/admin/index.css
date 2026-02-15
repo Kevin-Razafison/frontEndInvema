@@ -1,540 +1,392 @@
 /* ========================================
-   STYLES GLOBAUX - ADMIN DASHBOARD (THÈME BLANC)
-   Version améliorée avec meilleures pratiques
+   PANNEAU DE GESTION DES UTILISATEURS
    ======================================== */
 
-/* ========================================
-   RESET ET CONFIGURATION DE BASE
-   ======================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-*:focus {
-    outline: 2px solid #3498db;
-    outline-offset: 2px;
-}
-
-button {
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: inherit;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
+main .utilisateur-pannel-container {
+    width: 100%;
+    max-width: 100%;
+    min-height: calc(100vh - 120px);
+    padding-bottom: 50px;
+    padding-top: 100px; /* Espace pour la barre fixe */
 }
 
 /* ========================================
-   CONFIGURATION DU BODY (THÈME BLANC)
+   TITRE DU PANNEAU
    ======================================== */
-body {
-    background-color: #f8fafc;   /* Fond très clair */
-    min-height: 100vh;
-    overflow-x: hidden;
-    color: #1e293b;               /* Texte sombre pour contraste */
+
+main .utilisateur-pannel-container .pannel-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
 }
 
 /* ========================================
-   CONTAINER PRINCIPAL
+   BARRE D'ACTIONS (Ajouter utilisateur + Filtres)
    ======================================== */
-main {
-    position: relative;
-    margin-left: 250px;
-    margin-top: 60px;
-    margin-right: 0;
-    padding: 25px;
-    min-height: calc(100vh - 60px);
-    transition: margin-left 0.3s ease;
-    width: auto;
-}
 
-/* ========================================
-   NAVIGATION SIDEBAR
-   ======================================== */
-nav {
+main .utilisateur-pannel-container .ajouter-utilisateurs {
     position: fixed;
     top: 60px;
-    left: 0;
-    width: 250px;
-    height: calc(100vh - 60px);
-    background: #ffffff;           /* Fond blanc */
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
-    z-index: 999;
-    transition: all 0.3s ease;
-    overflow-y: auto;
-}
-
-/* Scrollbar de la nav */
-nav::-webkit-scrollbar {
-    width: 6px;
-}
-
-nav::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-nav::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
-
-/* ========================================
-   UTILITAIRES GLOBAUX
-   ======================================== */
-
-/* Classes pour masquer visuellement mais garder pour lecteurs d'écran */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
-/* État de chargement global */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    margin: -15px 0 0 -15px;
-    border: 3px solid #e2e8f0;
-    border-top: 3px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* ========================================
-   CLASSES UTILITAIRES
-   ======================================== */
-
-/* Espacement */
-.mt-10 { margin-top: 10px; }
-.mt-20 { margin-top: 20px; }
-.mt-30 { margin-top: 30px; }
-.mb-10 { margin-bottom: 10px; }
-.mb-20 { margin-bottom: 20px; }
-.mb-30 { margin-bottom: 30px; }
-
-/* Alignement */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-
-/* Flexbox */
-.flex { display: flex; }
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.flex-between {
+    right: 0;
+    left: 250px;
+    z-index: 100;
+    background: linear-gradient(135deg, #142536 0%, #1a3045 100%);
+    padding: 20px 30px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
-/* ========================================
-   BOUTONS GLOBAUX
-   ======================================== */
-.btn {
-    padding: 10px 20px;
+/* Le premier bouton "Ajouter utilisateur" */
+main .utilisateur-pannel-container .ajouter-utilisateurs > button {
+    padding: 12px 24px;
+    border: none;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
+    background-color: #27ae60;
+    color: white;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
     transition: all 0.3s ease;
-    border: none;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+main .utilisateur-pannel-container .ajouter-utilisateurs > button:hover {
+    background-color: #229954;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
 }
 
-.btn-success {
-    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-    color: white;
+main .utilisateur-pannel-container .ajouter-utilisateurs > button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
 }
 
-.btn-success:hover {
-    background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    color: white;
-}
-
-.btn-warning:hover {
-    background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
+main .utilisateur-pannel-container .ajouter-utilisateurs > button::before {
+    content: '+';
+    font-size: 20px;
+    font-weight: bold;
 }
 
 /* ========================================
-   CARDS GLOBALES (FOND BLANC, OMBRE LÉGÈRE)
+   FILTRES (à l'intérieur de la barre fixe)
    ======================================== */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    transition: all 0.3s ease;
+
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container {
+    display: flex;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border-radius: 10px;
 }
 
-.card:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
-.card-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 15px;
-}
-
-/* ========================================
-   INPUTS ET FORMS
-   ======================================== */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="tel"],
-select,
-textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter {
+    padding: 10px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
     font-size: 14px;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    background: white;
-    color: #1e293b;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.2s ease;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .filter:hover {
+    background-color: rgba(255, 255, 255, 0.15);
     border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    color: white;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #334155;
-    font-size: 14px;
-}
-
-.form-group {
-    margin-bottom: 20px;
+main .utilisateur-pannel-container .ajouter-utilisateurs .filter-button-container .is-filter-active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
 }
 
 /* ========================================
-   TABLES
+   CONTAINER DE LA LISTE
    ======================================== */
-table {
+
+main .utilisateur-pannel-container .list-users-containers {
     width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
+    max-width: 1400px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-thead {
-    background: #f8fafc;
-    color: #1e293b;
-    border-bottom: 2px solid #e2e8f0;
+/* En-tête de la liste - CORRIGÉ: 4 colonnes alignées avec le JS */
+main .utilisateur-pannel-container .list-users-containers .list-users-title {
+    display: grid;
+    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
+    gap: 20px;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+    border-bottom: 2px solid #e0e0e0;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #5a6c7d;
 }
 
-th {
-    padding: 15px;
-    text-align: left;
+/* ========================================
+   LIGNES D'UTILISATEURS
+   ======================================== */
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row {
+    display: grid;
+    grid-template-columns: 0.5fr 2fr 2fr 1.5fr;
+    gap: 20px;
+    padding: 20px 30px;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row:last-child {
+    border-bottom: none;
+}
+
+/* Colonne USER ID */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-id-column {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
+    color: #7f8c8d;
+}
+
+/* Colonne du nom */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-name-column {
+    font-weight: 600;
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+/* Colonne du type de permission */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column > div {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-td {
-    padding: 15px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-tr:hover {
-    background: #fafcff;
-}
-
-/* ========================================
-   BADGES
-   ======================================== */
-.badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-success {
-    background: #dff0d8;
-    color: #27ae60;
-}
-
-.badge-danger {
-    background: #f8dddd;
-    color: #e74c3c;
-}
-
-.badge-warning {
-    background: #fef7e0;
-    color: #f39c12;
-}
-
-.badge-info {
-    background: #d9edf7;
+/* Styles par rôle */
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-admin {
+    background-color: #e8f4fd;
     color: #3498db;
+    border: 2px solid #3498db;
 }
 
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
-
-/* Tablettes et petits écrans */
-@media (max-width: 1306px) {
-    /* Navigation condensée */
-    nav {
-        width: 100px;
-    }
-
-    nav section div {
-        display: none;
-    }
-
-    main {
-        margin-left: 100px;
-    }
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-employe {
+    background-color: #d4edda;
+    color: #27ae60;
+    border: 2px solid #27ae60;
 }
 
-/* Mobile */
-@media (max-width: 500px) {
-    /* Cache la navigation sur mobile */
-    nav {
-        width: 0;
-        transform: translateX(-100%);
-    }
-
-    /* Navigation mobile visible avec classe */
-    nav.mobile-visible {
-        transform: translateX(0);
-        width: 250px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    main {
-        margin-left: 0;
-        padding: 15px;
-    }
-
-    /* Overlay pour fermer la nav mobile */
-    .nav-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
-        display: none;
-    }
-
-    .nav-overlay.active {
-        display: block;
-    }
-
-    /* Boutons en pleine largeur sur mobile */
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .role-magasinier {
+    background-color: #fff3cd;
+    color: #f39c12;
+    border: 2px solid #f39c12;
 }
 
-/* Très petits écrans */
-@media (max-width: 320px) {
-    main {
-        padding: 10px;
-    }
-
-    .card {
-        padding: 15px;
-    }
-}
-
-/* ========================================
-   ANIMATIONS
-   ======================================== */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-out;
-}
-
-/* ========================================
-   PRÉFÉRENCES UTILISATEUR
-   ======================================== */
-
-/* Désactiver les animations pour ceux qui préfèrent */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* Option Dark mode désactivé pour garder le thème blanc
-   (vous pouvez supprimer ce bloc ou le personnaliser) */
-
-/* ========================================
-   PRINT STYLES
-   ======================================== */
-@media print {
-    header,
-    nav,
-    .btn,
-    .section-actions {
-        display: none !important;
-    }
-
-    main {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-    }
-
-    .card {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
-}
-
-/* ========================================
-   SCROLLBAR PERSONNALISÉ (ADAPTÉ AU THÈME CLAIR)
-   ======================================== */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* ========================================
-   TOOLTIPS (optionnel)
-   ======================================== */
-[data-tooltip] {
-    position: relative;
-    cursor: help;
-}
-
-[data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 12px;
-    background: #1e293b;
-    color: white;
-    font-size: 12px;
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission {
+    cursor: pointer;
+    padding: 6px;
     border-radius: 6px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    margin-bottom: 8px;
+    transition: all 0.2s ease;
 }
 
-[data-tooltip]:hover::after {
-    opacity: 1;
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission:hover {
+    background-color: #e8f4fd;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .user-permission-type-column .modify-permission img {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0.6);
+}
+
+/* ========================================
+   COLONNE DES ACTIONS
+   ======================================== */
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background-color: transparent;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
+    transform: scale(1.1);
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user {
+    background-color: #e8f4fd;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:hover {
+    background-color: #d1ecf1;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button {
+    background-color: #fee;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:hover {
+    background-color: #fdd;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button img,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user img {
+    width: 20px;
+    height: 20px;
+}
+
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .delete-user-button:active,
+main .utilisateur-pannel-container .list-users-containers .list-users-row .actions .modify-user:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   ÉTAT VIDE
+   ======================================== */
+
+.list-users-containers.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 60px 20px;
+}
+
+.list-users-containers.empty::before {
+    content: '👥';
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.list-users-containers.empty::after {
+    content: 'Aucun utilisateur trouvé';
+    font-size: 18px;
+    color: #95a5a6;
+    font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1306px) {
+    main .utilisateur-pannel-container .ajouter-utilisateurs {
+        left: 100px;
+    }
+}
+
+@media (max-width: 1024px) {
+    main .utilisateur-pannel-container .list-users-containers .list-users-title,
+    main .utilisateur-pannel-container .list-users-containers .list-users-row {
+        grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    main .utilisateur-pannel-container .ajouter-utilisateurs {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    main .utilisateur-pannel-container {
+        padding-top: 140px; /* Plus d'espace en mobile car la barre est plus haute */
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-title {
+        display: none;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-row > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-row > div::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #7f8c8d;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-row .actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 500px) {
+    main .utilisateur-pannel-container .ajouter-utilisateurs {
+        left: 0;
+        padding: 15px 20px;
+    }
+
+    main .utilisateur-pannel-container .pannel-title {
+        font-size: 24px;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers {
+        border-radius: 12px;
+    }
+
+    main .utilisateur-pannel-container .list-users-containers .list-users-row {
+        padding: 15px;
+    }
 }
